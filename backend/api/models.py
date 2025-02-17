@@ -24,7 +24,8 @@ class DiagnosisReport(models.Model):
     #XAI prediction
     #1-3 min image
     ckd_prediction = models.IntegerField(default=1)
-    updated = models.DateTimeField(auto_now = True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now_add = True)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
 
     def __str__(self):
