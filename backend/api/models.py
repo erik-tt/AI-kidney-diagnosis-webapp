@@ -8,7 +8,6 @@ class Patient(models.Model):
     GENDER = {
         "M": "Male",
         "F": "Female",
-        "O": "Other",
     }
 
     first_name = models.CharField(max_length=50)
