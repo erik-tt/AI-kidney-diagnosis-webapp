@@ -8,6 +8,7 @@ urlpatterns = [
     path('diagnosis_report/<int:patient_id>/', views.DiagnosisReportListView.as_view()),
 
     #Patient
-    path('patients/<int:pk>', views.PatientListView.as_view()),
-    path('patients/create', views.PatientCreateView.as_view()),
+    path('patients/', views.PatientGetPatientsView.as_view()),
+    path('patients/<int:pk>/', views.PatientGetPatientView.as_view()),
+    path('patients/create/', views.PatientCreateView.as_view()),
 ]
