@@ -1,13 +1,17 @@
 import { useState } from "react";
 import api from "../utils/api";
-import Dialog from '@mui/material/Dialog';
+import {
+    DialogClose,
+    DialogFooter,
+  } from "@/components/ui/dialog"
+import { Button } from "./ui/button";
 
-export interface PatientFormProps {
-    open: boolean;
-    onClose: () => void;
-  }
+interface PatientFormProps {
+    getPatients : () => void
+}
 
-function PatientForm({ open, onClose }: PatientFormProps) {
+
+function PatientForm({ getPatients } : PatientFormProps) {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [gender, setGender] = useState("F");
@@ -34,63 +38,58 @@ function PatientForm({ open, onClose }: PatientFormProps) {
             alert(error);
         } finally {
             setLoading(false);
-            onClose()
+            getPatients()
         }
     };
 
     return (
-        <Dialog onClose={onClose} open={open} sx={{
-            "& .MuiDialog-paper": {
-              width: "50vw",
-              maxWidth: "500px",
-              borderRadius: "1.5rem",
-              padding: "2rem",
-            },
-          }}>
-            <div className="p-4 space-y-4">
-                <h2 className="font-semibold text-gray-700">
-                    Patient Information
-                </h2>
-                <form className="flex flex-col" onSubmit={handleSubmit}>
-                    <label>First name</label>
-                    <input
-                        type="text"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        className="bg-gray-100 outline-1 p-1 rounded-xl mb-5"
-                    />
-                    <label>Last name</label>
-                    <input
-                        type="text"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        className="bg-gray-100 outline-1 p-1 rounded-xl mb-5"
-                    />
-                    <label>Gender</label>
-                    <select
-                        className="bg-gray-100 outline-1 p-1 rounded-xl mb-5"
-                        value={gender}
-                        onChange={(e) => setGender(e.target.value)}
-                    >
-                        <option value="F">Female</option>
-                        <option value="M">Male</option>
-                    </select>
-                    <label>Date of birth</label>
-                    <input
-                        type="date"
-                        value={dateOfBirth}
-                        onChange={(e) => setDateOfBirth(e.target.value)}
-                        className="bg-gray-100 outline-1 p-1 rounded-xl mb-5"
-                    />
-                    <button
-                        className="flex w-full justify-center rounded-md bg-gray-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-gray-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
+        <div className="p-4 space-y-4">
+            <h2 className="font-semibold text-gray-700">
+                Patient Information
+            </h2>
+            <form className="flex flex-col" onSubmit={handleSubmit}>
+                <label>First name</label>
+                <input
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className="bg-gray-100 outline-1 p-1 rounded-xl mb-5"
+                />
+                <label>Last name</label>
+                <input
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    className="bg-gray-100 outline-1 p-1 rounded-xl mb-5"
+                />
+                <label>Gender</label>
+                <select
+                    className="bg-gray-100 outline-1 p-1 rounded-xl mb-5"
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value)}
+                >
+                    <option value="F">Female</option>
+                    <option value="M">Male</option>
+                </select>
+                <label>Date of birth</label>
+                <input
+                    type="date"
+                    value={dateOfBirth}
+                    onChange={(e) => setDateOfBirth(e.target.value)}
+                    className="bg-gray-100 outline-1 p-1 rounded-xl mb-5"
+                />
+                <DialogFooter className="sm:justify-start">
+                    <DialogClose asChild>
+                    <Button
+                        className="flex w-full justify-center "
                         type="submit"
                     >
                         Register
-                    </button>
-                </form>
-            </div>
-        </Dialog>
+                    </Button>
+                    </DialogClose>
+                </DialogFooter>
+            </form>
+        </div>
     );
 }
 

@@ -2,20 +2,23 @@ import { SetStateAction, useEffect, useState } from "react";
 import api from "../utils/api";
 import { Patient } from "../types/types";
 import PatientForm from "./PatientForm";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
+import {
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
+import { Button } from "./ui/button";
+import { useNavigate } from "react-router-dom";
 
 function PatientList() {
     const [patients, setPatients] = useState<Patient[]>([]);
-    const [open, setOpen] = useState(false);
-    
-
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
-    const handleClose = () => {
-        setOpen(false);
-        getPatients()
-    };
+    const navigate = useNavigate();
 
     useEffect(() => {
         getPatients();
@@ -31,50 +34,48 @@ function PatientList() {
             .catch((err) => alert(err));
     };
 
+
     return (
-        <div className="relative overflow-x-auto max-w-full mx-auto p-10">
-            <h2 className="text-4xl font-semibold leading-none tracking-tight text-gray-700 md:text-2xl lg:text-4xl mb-5">
-                Patient List
-            </h2>
-            <table className="table-auto w-full text-sm text-left rtl:text-right text-gray-500 drop-shadow-md bg-gray-50">
-                <thead className="text-xs text-gray-700 uppercase  dark:text-gray-400">
-                    <tr>
-                        <th scope="col" className="px-6 py-3">
-                            Last name
-                        </th>
-                        <th scope="col" className="px-6 py-3">
-                            First name
-                        </th>
-                        <th scope="col" className="px-6 py-3">
-                            Gender
-                        </th>
-                        <th scope="col" className="px-6 py-3">
-                            Date of birth
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {patients.map((patient: Patient) => (
-                        <tr className="bg-white border-b border-gray-200 hover:bg-gray-50">
-                            <td className="px-6 py-4">{patient.last_name}</td>
-                            <td className="px-6 py-4">{patient.first_name}</td>
-                            <td className="px-6 py-4">{patient.gender}</td>
-                            <td className="px-6 py-4">
-                                {patient.date_of_birth}
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        
-            <button
-                onClick={handleClickOpen}
-                className="mt-2 rounded-md cursor-pointer drop-shadow-md bg-gray-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-gray-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
-                type="submit"
-            >
-                Register New Patient
-            </button>
-            <PatientForm open={open} onClose={handleClose} />
+        <div className="relative overflow-x-auto max-w-6xl mx-auto p-10">
+            <h2 className="font-semibold text-2xl">Patient List</h2>
+            <Table className="bg-white">
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Last name</TableHead>
+                        <TableHead>First name</TableHead>
+                        <TableHead>Gender</TableHead>
+                        <TableHead>Date of birth</TableHead>
+                        <TableHead>Action</TableHead>
+                    </TableRow>
+                </TableHeader>
+                {patients.map((patient: Patient) => (
+                    <TableBody>
+                    <TableRow>
+                        <TableCell>{patient.last_name}</TableCell>
+                        <TableCell>{patient.first_name}</TableCell>
+                        <TableCell>{patient.gender}</TableCell>
+                        <TableCell>{patient.date_of_birth}</TableCell>
+                        <TableCell>
+                            <Button onClick={() => navigate(`/patients/${patient.id}`)}>Patient Profile</Button>
+                        </TableCell>
+                    </TableRow>
+                </TableBody>
+                ))}
+            </Table>
+
+            <Dialog>
+                <DialogTrigger asChild>
+                    <Button
+                        variant="outline"
+                        className="mt-2 "
+                    >
+                        Register New Patient
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                    <PatientForm getPatients={getPatients} />
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
