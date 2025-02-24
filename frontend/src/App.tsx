@@ -6,13 +6,13 @@ import {
     useLocation,
 } from "react-router-dom";
 import Register from "./pages/Register";
-import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./styles/index.css";
 import Header from "./components/Header";
 import PatientProfile from "./pages/PatientProfile";
+import PatientList from "./pages/PatientList";
 
 function Logout() {
     localStorage.clear();
@@ -28,7 +28,7 @@ function App() {
                     path="/"
                     element={
                         <ProtectedRoute>
-                            <Home />
+                            <PatientList/>
                         </ProtectedRoute>
                     }
                 />
