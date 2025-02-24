@@ -47,15 +47,16 @@ class PatientCreateView(generics.CreateAPIView):
     serializer_class = PatientSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-
-class PatientListView(generics.ListAPIView):
+class PatientGetPatientsView(generics.ListAPIView):
+    queryset = Patient.objects.all()
     serializer_class = PatientSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    #This will enable anyone to search for a patient (no access control other than logged in)
-    def get_queryset(self):
-        last_name = self.kwargs.get('last_name')
-        return Patient.objects.filter(last_name=last_name)
+
+class PatientGetPatientView(generics.RetrieveAPIView):
+    serializer_class = PatientSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Patient.objects.all()
 
 
 #User
