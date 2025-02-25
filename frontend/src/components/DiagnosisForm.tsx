@@ -28,7 +28,7 @@ function DiagnosisForm( {patient_id} : DiagnosisFormProps) {
             formData.append("dicom_file", file);
         }
         if (patient_id) {
-            formData.append("patient_id", patient_id);
+            formData.append("patient", patient_id);
         }
 
         try {

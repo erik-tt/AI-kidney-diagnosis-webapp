@@ -18,14 +18,19 @@ class Patient(models.Model):
     def __str__(self):
         return f"Patient information for {self.last_name}"
 
+def report_directory_path(instance, filename):
+    return 'patient_{0}/{1}'.format(instance.patient.id, filename)
+
 class DiagnosisReport(models.Model):
     #Mask prediction
     #XAI prediction
-    #1-3 min image
-    ckd_prediction = models.IntegerField(default=1)
+    ckd_prediction = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now_add = True)
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    updated = models.DateTimeField(auto_now = True)
+    patient = models.OneToOneField(Patient, on_delete=models.CASCADE)
+    nifti_image = models.FileField(upload_to=report_directory_path, default=None)
+    nifti_mask = models.FileField(upload_to=report_directory_path, default=None)
+    png_image = models.ImageField(upload_to=report_directory_path, default=None)
 
     def __str__(self):
         return f"Diagnosis Report for {self.patient.last_name}"

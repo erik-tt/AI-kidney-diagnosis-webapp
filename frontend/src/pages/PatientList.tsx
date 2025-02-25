@@ -1,4 +1,4 @@
-import { SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../utils/api";
 import { Patient } from "../types/types";
 import PatientForm from "../components/PatientForm";

@@ -21,7 +21,7 @@ class PatientSerializer(serializers.ModelSerializer):
 class DiagnosisReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = DiagnosisReport
-        fields = ["id", "ckd_stage", "patient", "updated", "created_at"]
+        fields = ["id", "ckd_prediction", "patient", "updated", "created_at"]
         #Consider making patient read only as it should not be changed
     
     def validate_patient_id(self, value):
@@ -30,5 +30,3 @@ class DiagnosisReportSerializer(serializers.ModelSerializer):
         except Patient.DoesNotExist:
             raise serializers.ValidationError("Patient does not exist")
         return value
-
-
