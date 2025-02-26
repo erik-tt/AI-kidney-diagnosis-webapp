@@ -7,7 +7,10 @@ from rest_framework.response import Response
 from rest_framework import permissions
 from django.core.files.base import ContentFile
 
-from .services.image_service import save_and_get_images
+from .services.segmentation_service import get_predicted_masks
+
+from .services.image_service import save_and_get_png_nifti_images
+from .services.image_service import save_and_get_nifti_mask
 from .serializers import UserSerializer, DiagnosisReportSerializer, PatientSerializer
 from rest_framework import status
 from rest_framework import permissions
@@ -16,22 +19,38 @@ from .models import DiagnosisReport, Patient
 
 
 #Reports
+#Creates or updates a report for the user depending on if it exists or not
 class DiagnosisReportCreateView(generics.CreateAPIView):
     #Using a retrieved view
     serializer_class = DiagnosisReportSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def perform_create(self, serializer):
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         dicom_file = self.request.FILES.get("dicom_file")
         
-        if dicom_file:
-            report = serializer.save()
-            #Handle image processing
-            image_nii_rel_path, image_png__rel_path = save_and_get_images(dicom_file, report.id, report.patient.id)
-            report.nifti_image = image_nii_rel_path
-            report.png_image = image_png__rel_path
-            report.save()
-            #Run ML prediction algorithm
+        patient = serializer.validated_data.get("patient")
+        image_nii_rel_path, image_nii_path, image_png_rel_path = save_and_get_png_nifti_images(dicom_file, patient=patient.id)
+        nifti_image = image_nii_rel_path
+        png_image = image_png_rel_path
+        #Run ML prediction algorithm
+        pixel_array_masks = get_predicted_masks(image_nii_path)
+        nifti_rel_path, nifti_path = save_and_get_nifti_mask(pixel_array=pixel_array_masks, patient=patient.id)
+        nifti_mask = nifti_rel_path
+
+        validated_data = serializer.validated_data
+
+        instance, created = DiagnosisReport.objects.update_or_create(
+            patient=patient,
+            defaults={**validated_data, "nifti_image": nifti_image, "nifti_mask": nifti_mask, "png_image": png_image}
+        )
+        print(created)
+        
+        if created:
+            return Response({"message": f"Created new report for {patient.last_name}" }, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"message": f"updated report for {patient.last_name}" },status=status.HTTP_200_OK)
 
 
 

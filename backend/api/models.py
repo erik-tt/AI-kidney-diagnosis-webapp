@@ -24,10 +24,10 @@ def report_directory_path(instance, filename):
 class DiagnosisReport(models.Model):
     #Mask prediction
     #XAI prediction
-    ckd_prediction = models.IntegerField()
+    ckd_prediction = models.IntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now = True)
-    patient = models.OneToOneField(Patient, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     nifti_image = models.FileField(upload_to=report_directory_path, default=None)
     nifti_mask = models.FileField(upload_to=report_directory_path, default=None)
     png_image = models.ImageField(upload_to=report_directory_path, default=None)

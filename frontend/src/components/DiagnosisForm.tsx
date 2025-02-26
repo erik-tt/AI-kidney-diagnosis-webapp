@@ -34,7 +34,9 @@ function DiagnosisForm( {patient_id} : DiagnosisFormProps) {
         try {
             const res = await api.post("api/diagnosis_report/create/", formData, { headers: { "Content-Type": "multipart/form-data" } });
             if (res.status === 201) {
-                alert("Submitted data for automatic analyzis");
+                alert("Added data");
+            } if (res.status === 200) {
+                alert("Updated data");
             } else alert("failed to send data");
         } catch (error) {
             alert(error);
