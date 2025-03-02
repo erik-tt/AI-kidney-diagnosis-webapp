@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DiagnosisForm from "@/components/DiagnosisForm";
+import DiagnosisDashboard from "@/components/DiagnosisDashboard";
 
 function PatientProfile() {
     const { id } = useParams();
@@ -61,7 +62,7 @@ function PatientProfile() {
                         </TabsTrigger>
                     </TabsList>
                     <TabsContent value="diagnosis" className="flex flex-row max-w-full justify-center">
-                        <h3>CKD prediction and other data</h3>
+                        <DiagnosisDashboard patient_id={id}/>
                     </TabsContent>
                     <TabsContent value="explanation" className="flex flex-row max-w-full justify-center">
                         <h3>XAI explanation here</h3>

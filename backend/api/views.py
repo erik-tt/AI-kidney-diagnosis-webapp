@@ -9,8 +9,7 @@ from django.core.files.base import ContentFile
 
 from .services.segmentation_service import get_predicted_masks
 
-from .services.image_service import save_and_get_png_nifti_images
-from .services.image_service import save_and_get_nifti_mask
+from .services.image_service import save_and_get_png_nifti_images, overlay_mask_on_image_save_png, save_and_get_nifti_mask
 from .serializers import UserSerializer, DiagnosisReportSerializer, PatientSerializer
 from rest_framework import status
 from rest_framework import permissions
@@ -38,14 +37,15 @@ class DiagnosisReportCreateView(generics.CreateAPIView):
         pixel_array_masks = get_predicted_masks(image_nii_path)
         nifti_rel_path, nifti_path = save_and_get_nifti_mask(pixel_array=pixel_array_masks, patient=patient.id)
         nifti_mask = nifti_rel_path
-
+        #Overlay masks on image and save as png
+        png_image_overlay = overlay_mask_on_image_save_png(mask=nifti_path, image=image_nii_path, patient=patient.id)
+        
         validated_data = serializer.validated_data
 
         instance, created = DiagnosisReport.objects.update_or_create(
             patient=patient,
-            defaults={**validated_data, "nifti_image": nifti_image, "nifti_mask": nifti_mask, "png_image": png_image}
+            defaults={**validated_data, "nifti_image": nifti_image, "nifti_mask": nifti_mask, "png_image": png_image, "png_image_overlay": png_image_overlay}
         )
-        print(created)
         
         if created:
             return Response({"message": f"Created new report for {patient.last_name}" }, status=status.HTTP_201_CREATED)
@@ -54,14 +54,13 @@ class DiagnosisReportCreateView(generics.CreateAPIView):
 
 
 
-class DiagnosisReportListView(generics.ListAPIView):
-    #Using a retrieved view 
+class DiagnosisReportDetailView(generics.RetrieveAPIView):
     serializer_class = DiagnosisReportSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        patient_id = self.kwargs.get('patient_id')
-        return DiagnosisReport.objects.filter(patient_id=patient_id)
+    def get_object(self):
+        obj = DiagnosisReport.objects.get(patient = self.kwargs['patient_id'])
+        return obj
     
 class DiagnosisReportDelete(generics.DestroyAPIView):
     queryset = DiagnosisReport.objects.all()
