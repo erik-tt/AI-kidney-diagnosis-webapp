@@ -2,16 +2,12 @@ import os
 from django.conf import settings
 import numpy as np
 import nibabel as nib
-import pydicom
-import io
 from PIL import Image, ImageDraw
 from skimage import measure
 
 
-def save_and_get_png_nifti_images(dicom_file, patient) :
-    dicom_data = pydicom.dcmread(io.BytesIO(dicom_file.read()))
-    pixel_array = dicom_data.pixel_array.astype(np.float32)
-    avg_array = np.mean(pixel_array[6:18], axis=0)
+def save_and_get_png_nifti_images(dicom_image, patient) :
+    avg_array = np.mean(dicom_image[6:18], axis=0)
 
     #Nifti image for model input
     output_path = os.path.join(settings.MEDIA_ROOT, f"data/patient_{patient}/")

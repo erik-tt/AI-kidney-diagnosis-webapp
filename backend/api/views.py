@@ -6,10 +6,14 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import permissions
 from django.core.files.base import ContentFile
+import pydicom
+import io
+import numpy as np
 
 from .services.segmentation_service import get_predicted_masks
 
 from .services.image_service import save_and_get_png_nifti_images, overlay_mask_on_image_save_png, save_and_get_nifti_mask
+from .services.renogram_service import generate_renogram
 from .serializers import UserSerializer, DiagnosisReportSerializer, PatientSerializer
 from rest_framework import status
 from rest_framework import permissions
@@ -27,10 +31,13 @@ class DiagnosisReportCreateView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        #Get the pixel array
         dicom_file = self.request.FILES.get("dicom_file")
+        dicom_image = pydicom.dcmread(io.BytesIO(dicom_file.read())).pixel_array.astype(np.float32)
         
+        #Handle images
         patient = serializer.validated_data.get("patient")
-        image_nii_rel_path, image_nii_path, image_png_rel_path = save_and_get_png_nifti_images(dicom_file, patient=patient.id)
+        image_nii_rel_path, image_nii_path, image_png_rel_path = save_and_get_png_nifti_images(dicom_image=dicom_image, patient=patient.id)
         nifti_image = image_nii_rel_path
         png_image = image_png_rel_path
         #Run ML prediction algorithm
@@ -39,12 +46,15 @@ class DiagnosisReportCreateView(generics.CreateAPIView):
         nifti_mask = nifti_rel_path
         #Overlay masks on image and save as png
         png_image_overlay = overlay_mask_on_image_save_png(mask=nifti_path, image=image_nii_path, patient=patient.id)
+        #Use masks to generate renogram
+        renogram_dict = generate_renogram(pixel_array=dicom_image, mask=nifti_path)
+        
         
         validated_data = serializer.validated_data
 
         instance, created = DiagnosisReport.objects.update_or_create(
             patient=patient,
-            defaults={**validated_data, "nifti_image": nifti_image, "nifti_mask": nifti_mask, "png_image": png_image, "png_image_overlay": png_image_overlay}
+            defaults={**validated_data, "nifti_image": nifti_image, "nifti_mask": nifti_mask, "png_image": png_image, "png_image_overlay": png_image_overlay, "renogram_dict": renogram_dict}
         )
         
         if created:

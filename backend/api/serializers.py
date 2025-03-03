@@ -21,7 +21,7 @@ class PatientSerializer(serializers.ModelSerializer):
 class DiagnosisReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = DiagnosisReport
-        fields = ["id", "ckd_prediction", "patient", "updated", "created_at", "png_image_overlay"]
+        fields = ["id", "ckd_prediction", "patient", "updated", "created_at", "png_image_overlay", "renogram_dict"]
         #Consider making patient read only as it should not be changed
     
     def validate_patient_id(self, value):

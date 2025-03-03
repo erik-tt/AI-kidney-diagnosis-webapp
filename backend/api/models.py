@@ -33,6 +33,7 @@ class DiagnosisReport(models.Model):
     #We might not need to store both of these
     png_image = models.ImageField(upload_to=report_directory_path, default=None)
     png_image_overlay = models.ImageField(upload_to=report_directory_path, default=None)
+    renogram_dict = models.JSONField(default=dict, blank=True)
 
     def __str__(self):
         return f"Diagnosis Report for {self.patient.last_name}"
