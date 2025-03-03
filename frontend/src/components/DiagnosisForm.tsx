@@ -47,13 +47,17 @@ function DiagnosisForm( {patient_id} : DiagnosisFormProps) {
 
 
     return (
-        <form className="mt-4"  onSubmit={handleSubmit}>
-            <div className="grid w-full max-w-sm items-center gap-1.5">
-            <Label htmlFor="DICOM">DICOM scintigraphy file</Label>
-            <Input id="DICOM" type="file" accept='.dcm' required onChange={handleFileInput}/>
-            </div>
-            <Button className="mt-2" type="submit">Analyze scintigraphy file</Button>
-        </form>
+        <div>
+            <h2 className="font-semibold text-2xl mt-2 mb-2">Upload data to analyze</h2>
+            <p className="text-gray-600">Upload a 99mTc-MAG3 scintigraphy POST study to this patient. The data will be analyzed and the results will be visible under diagnosis. Note that a single patient can as of now only contain one report. Uploading a study will replace the previous one.</p>
+            <form className="mt-4"  onSubmit={handleSubmit}>
+                <div className="grid w-full max-w-sm items-center gap-1.5">
+                <Label htmlFor="DICOM" className="font-semibold">DICOM scintigraphy file</Label>
+                <Input id="DICOM" type="file" accept='.dcm' required onChange={handleFileInput} className="shadow bg-white"/>
+                </div>
+                <Button className="mt-2 shadow" type="submit">Analyze scintigraphy file</Button>
+            </form>
+        </div>
     )
 }
 

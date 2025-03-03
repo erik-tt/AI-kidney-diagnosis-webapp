@@ -15,4 +15,5 @@ export interface DiagnosisReport {
     created_at: string
     png_image: string
     png_image_overlay: string
+    renogram_dict: object
 }

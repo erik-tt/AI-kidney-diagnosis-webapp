@@ -13,6 +13,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DiagnosisForm from "@/components/DiagnosisForm";
 import DiagnosisDashboard from "@/components/DiagnosisDashboard";
+import { Separator } from "@/components/ui/separator";
 
 function PatientProfile() {
     const { id } = useParams();
@@ -33,7 +34,7 @@ function PatientProfile() {
     };
 
     return (
-        <div className="relative overflow-x-auto max-w-7xl mx-auto mt-10 p-2">
+        <div className="relative overflow-x-auto max-w-7xl mx-auto mt-10 p-2 ">
             <Breadcrumb>
                 <BreadcrumbList>
                     <BreadcrumbItem>
@@ -51,8 +52,9 @@ function PatientProfile() {
                 {" "}
                 {patient?.first_name} {patient?.last_name}
             </h2>
-                <Tabs defaultValue="diagnosis" className=" max-w-full mt-2">
-                    <TabsList>
+            <Separator className="mt-2"/>
+                <Tabs defaultValue="diagnosis" className=" max-w-full mt-2 ">
+                    <TabsList className="shadow-sm">
                         <TabsTrigger value="diagnosis">Diagnosis</TabsTrigger>
                         <TabsTrigger value="explanation">
                             Explanation
