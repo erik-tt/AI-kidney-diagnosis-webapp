@@ -48,18 +48,33 @@ def overlay_mask_on_image_save_png(mask, image, patient):
     img_pixel_array = np.array(img.dataobj)
     msk_pixel_array = np.array(msk.dataobj)
 
-    contours = measure.find_contours(msk_pixel_array)
-
-    #Parts of this was generated with ChatGPT by OpenAI and modified to fit the use case.
+    #Parts of the following logic was generated with ChatGPT by OpenAI and modified to fit the use case.
     anat_image = Image.fromarray(np.uint8(img_pixel_array / np.max(img_pixel_array) * 255))
     anat_image = anat_image.convert('RGB')
     draw = ImageDraw.Draw(anat_image)
 
+    contours_1 = measure.find_contours(msk_pixel_array == 1.0)
+
     # Overlay the contours
-    for contour in contours:
+    for contour in contours_1:
         contour = contour.astype(int)
+        contour_points = []
+        for point in contour:
+            contour_points.append((point[1], point[0]))
         contour_points = [(point[1], point[0]) for point in contour]
-        draw.line(contour_points, fill="red", width=2)
+
+        draw.line(contour_points, fill="blue", width=1)
+    
+    contours_2 = measure.find_contours(msk_pixel_array == 2.0)
+
+    for contour in contours_2:
+        contour = contour.astype(int)
+        contour_points = []
+        for point in contour:
+            contour_points.append((point[1], point[0]))
+        contour_points = [(point[1], point[0]) for point in contour]
+
+        draw.line(contour_points, fill="red", width=1)
         
     output_path = os.path.join(settings.MEDIA_ROOT, f"data/patient_{patient}/")
     overlay_image_png_path = os.path.join(output_path, f"overlay_image.png")
