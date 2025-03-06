@@ -1,3 +1,4 @@
+import { Url } from "url"
 
 export interface Patient {
     id: string,
@@ -5,4 +6,14 @@ export interface Patient {
     last_name: string,
     gender: string,
     date_of_birth: string
+}
+
+export interface DiagnosisReport {
+    id: string,
+    ckd_prediction: number,
+    updated: string,
+    created_at: string
+    png_image: string
+    png_image_overlay: string
+    renogram_dict: object
 }

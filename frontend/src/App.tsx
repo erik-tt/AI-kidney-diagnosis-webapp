@@ -3,7 +3,6 @@ import {
     Routes,
     Route,
     Navigate,
-    useLocation,
 } from "react-router-dom";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
