@@ -20,7 +20,7 @@ model =  SwinUNETR(
         )
 
 #change it to be torch script
-model.load_state_dict(torch.load(os.path.join(settings.BASE_DIR ,'api/services/models/segmentation/checkpoint_swinunetr.pth'), weights_only=False)["model_state_dict"]) # This line uses .load() to read a .pth file and load the network weights on to the architecture.
+model.load_state_dict(torch.load(os.path.join(settings.BASE_DIR ,'api/services/models/segmentation/best_swinunetr.pth'), weights_only=False, map_location=torch.device('cpu'))["model_state_dict"]) # This line uses .load() to read a .pth file and load the network weights on to the architecture.
 model.eval()
 
 def transform_image(image_path):
@@ -42,7 +42,7 @@ def get_predicted_masks(image_path):
     output_remove_one_hot = output.cpu().numpy()
     #Set the right side to be 2
     output_remove_one_hot[:, output_remove_one_hot.shape[0]//2:] = np.where(output_remove_one_hot[:, output_remove_one_hot.shape[0]//2:] == 1, 2, output_remove_one_hot[:, output_remove_one_hot.shape[0]//2:])
-    
+
     return output_remove_one_hot
     
   
