@@ -10,9 +10,8 @@ import pydicom
 import io
 import numpy as np
 
-from .services.segmentation_service import get_predicted_masks
-
-from .services.image_service import save_and_get_png_nifti_images, overlay_mask_on_image_save_png, save_and_get_nifti_mask
+from .services.segmentation_service import get_segmentation_prediction, process_prediction
+from .services.image_service import save_and_get_png_nifti_images
 from .services.renogram_service import generate_renogram
 from .serializers import UserSerializer, DiagnosisReportSerializer, PatientSerializer
 from rest_framework import status
@@ -37,17 +36,18 @@ class DiagnosisReportCreateView(generics.CreateAPIView):
         
         #Handle images
         patient = serializer.validated_data.get("patient")
-        image_nii_rel_path, image_nii_path, image_png_rel_path = save_and_get_png_nifti_images(dicom_image=dicom_image, patient=patient.id)
+        image_nii_rel_path, image_nii_path, image_png_rel_path, image_png_path = save_and_get_png_nifti_images(dicom_image=dicom_image, patient=patient.id)
         nifti_image = image_nii_rel_path
         png_image = image_png_rel_path
-        #Run ML prediction algorithm
-        pixel_array_masks = get_predicted_masks(image_nii_path)
-        nifti_rel_path, nifti_path = save_and_get_nifti_mask(pixel_array=pixel_array_masks, patient=patient.id)
-        nifti_mask = nifti_rel_path
+        
+        #Run ML segmentation prediction algorithm
+        pixel_array_model_output = get_segmentation_prediction(image_nii_path)
+        png_image_overlay, mask_rel_path, mask_path = process_prediction(model_output=pixel_array_model_output, image=image_png_path, patient=patient.id)
+
+        nifti_mask = mask_rel_path
         #Overlay masks on image and save as png
-        png_image_overlay = overlay_mask_on_image_save_png(mask=nifti_path, image=image_nii_path, patient=patient.id)
         #Use masks to generate renogram
-        renogram_dict = generate_renogram(pixel_array=dicom_image, mask=nifti_path)
+        renogram_dict = generate_renogram(pixel_array=dicom_image, mask=mask_path)
         
         
         validated_data = serializer.validated_data
