@@ -14,6 +14,7 @@ class Patient(models.Model):
     last_name = models.CharField(max_length=50)
     gender = models.CharField(max_length=1, choices=GENDER)
     date_of_birth = models.DateField()
+    doctor = models.ForeignKey(User, on_delete=models.CASCADE, related_name="patients")
 
     def __str__(self):
         return f"Patient information for {self.last_name}"

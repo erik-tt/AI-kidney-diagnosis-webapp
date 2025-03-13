@@ -17,6 +17,7 @@ class PatientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Patient
         fields = ["id", "first_name", "last_name", "gender", "date_of_birth"]
+        extra_kwargs = {"doctor" : {"read_only":True}}
 
 class DiagnosisReportSerializer(serializers.ModelSerializer):
     class Meta:

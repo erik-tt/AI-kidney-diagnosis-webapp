@@ -82,11 +82,20 @@ class DiagnosisReportDelete(generics.DestroyAPIView):
 class PatientCreateView(generics.CreateAPIView):
     serializer_class = PatientSerializer
     permission_classes = [permissions.IsAuthenticated]
+    
+    def perform_create(self, serializer):
+        if serializer.is_valid():
+            serializer.save(doctor=self.request.user)
+        else:
+            print(serializer.errors)
 
 class PatientGetPatientsView(generics.ListAPIView):
-    queryset = Patient.objects.all()
     serializer_class = PatientSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Patient.objects.filter(doctor=user)
 
 
 class PatientGetPatientView(generics.RetrieveAPIView):
