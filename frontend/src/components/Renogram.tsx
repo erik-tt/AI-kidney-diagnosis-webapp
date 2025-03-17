@@ -11,7 +11,8 @@ function Renogram( {data} : RenogramProps) {
         y: values,
         type: 'scatter',
         mode: 'lines',
-        name: key == "1.0" ? "Left Kidney" : "Right Kidney" 
+        name: key == "1.0" ? "Left Kidney" : "Right Kidney",
+        line: { color: key=="1.0" ? "blue" : "red", width: 2 },
     }));
 
     return ( 

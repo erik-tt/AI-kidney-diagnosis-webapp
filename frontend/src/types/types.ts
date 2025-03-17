@@ -13,7 +13,7 @@ export interface DiagnosisReport {
     ckd_prediction: number,
     updated: string,
     created_at: string
-    png_image: string
     png_image_overlay: string
     renogram_dict: object
+    grad_cam : string
 }

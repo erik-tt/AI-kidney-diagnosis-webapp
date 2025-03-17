@@ -10,15 +10,17 @@ import pydicom
 import io
 import numpy as np
 
-from .services.segmentation_service import get_predicted_masks
-
-from .services.image_service import save_and_get_png_nifti_images, overlay_mask_on_image_save_png, save_and_get_nifti_mask
+from .services.segmentation_service import get_segmentation_prediction, process_prediction
+from .services.classification_service import get_ckd_prediction
+from .services.image_service import save_and_get_png_nifti_images
 from .services.renogram_service import generate_renogram
 from .serializers import UserSerializer, DiagnosisReportSerializer, PatientSerializer
 from rest_framework import status
 from rest_framework import permissions
 from rest_framework.exceptions import NotFound
 from .models import DiagnosisReport, Patient
+from django.shortcuts import get_object_or_404
+from django.core.exceptions import MultipleObjectsReturned
 
 
 #Reports
@@ -37,24 +39,28 @@ class DiagnosisReportCreateView(generics.CreateAPIView):
         
         #Handle images
         patient = serializer.validated_data.get("patient")
-        image_nii_rel_path, image_nii_path, image_png_rel_path = save_and_get_png_nifti_images(dicom_image=dicom_image, patient=patient.id)
+        image_nii_rel_path, image_nii_path, image_png_rel_path, image_png_path = save_and_get_png_nifti_images(dicom_image=dicom_image, patient=patient.id)
         nifti_image = image_nii_rel_path
         png_image = image_png_rel_path
-        #Run ML prediction algorithm
-        pixel_array_masks = get_predicted_masks(image_nii_path)
-        nifti_rel_path, nifti_path = save_and_get_nifti_mask(pixel_array=pixel_array_masks, patient=patient.id)
-        nifti_mask = nifti_rel_path
+        
+        #Run ML segmentation prediction algorithm
+        pixel_array_model_output = get_segmentation_prediction(image_nii_path)
+        png_image_overlay, mask_rel_path, mask_path = process_prediction(model_output=pixel_array_model_output, image=image_png_path, patient=patient.id)
+
+        nifti_mask = mask_rel_path
         #Overlay masks on image and save as png
-        png_image_overlay = overlay_mask_on_image_save_png(mask=nifti_path, image=image_nii_path, patient=patient.id)
         #Use masks to generate renogram
-        renogram_dict = generate_renogram(pixel_array=dicom_image, mask=nifti_path)
+        renogram_dict = generate_renogram(pixel_array=dicom_image, mask=mask_path)
+
+        #Run classification prediction
+        ckd_prediction, grad_cam_rel_path = get_ckd_prediction(image_nii_path, patient=patient.id, explanation=True)
         
         
         validated_data = serializer.validated_data
 
         instance, created = DiagnosisReport.objects.update_or_create(
             patient=patient,
-            defaults={**validated_data, "nifti_image": nifti_image, "nifti_mask": nifti_mask, "png_image": png_image, "png_image_overlay": png_image_overlay, "renogram_dict": renogram_dict}
+            defaults={**validated_data, 'ckd_prediction': ckd_prediction, "nifti_image": nifti_image, "nifti_mask": nifti_mask, "png_image": png_image, "png_image_overlay": png_image_overlay, "renogram_dict": renogram_dict, "grad_cam": grad_cam_rel_path}
         )
         
         if created:
@@ -69,8 +75,9 @@ class DiagnosisReportDetailView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
-        obj = DiagnosisReport.objects.get(patient = self.kwargs['patient_id'])
+        obj = get_object_or_404(DiagnosisReport, patient=self.kwargs['patient_id'])
         return obj
+
     
 class DiagnosisReportDelete(generics.DestroyAPIView):
     queryset = DiagnosisReport.objects.all()
@@ -82,11 +89,20 @@ class DiagnosisReportDelete(generics.DestroyAPIView):
 class PatientCreateView(generics.CreateAPIView):
     serializer_class = PatientSerializer
     permission_classes = [permissions.IsAuthenticated]
+    
+    def perform_create(self, serializer):
+        if serializer.is_valid():
+            serializer.save(doctor=self.request.user)
+        else:
+            print(serializer.errors)
 
 class PatientGetPatientsView(generics.ListAPIView):
-    queryset = Patient.objects.all()
     serializer_class = PatientSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Patient.objects.filter(doctor=user)
 
 
 class PatientGetPatientView(generics.RetrieveAPIView):

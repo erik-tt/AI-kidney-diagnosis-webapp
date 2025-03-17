@@ -14,6 +14,7 @@ class Patient(models.Model):
     last_name = models.CharField(max_length=50)
     gender = models.CharField(max_length=1, choices=GENDER)
     date_of_birth = models.DateField()
+    doctor = models.ForeignKey(User, on_delete=models.CASCADE, related_name="patients")
 
     def __str__(self):
         return f"Patient information for {self.last_name}"
@@ -23,7 +24,6 @@ def report_directory_path(instance, filename):
 
 class DiagnosisReport(models.Model):
     #Mask prediction
-    #XAI prediction
     ckd_prediction = models.IntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now = True)
@@ -34,6 +34,7 @@ class DiagnosisReport(models.Model):
     png_image = models.ImageField(upload_to=report_directory_path, default=None)
     png_image_overlay = models.ImageField(upload_to=report_directory_path, default=None)
     renogram_dict = models.JSONField(default=dict, blank=True)
+    grad_cam =  models.ImageField(upload_to=report_directory_path, default=None)
 
     def __str__(self):
         return f"Diagnosis Report for {self.patient.last_name}"
