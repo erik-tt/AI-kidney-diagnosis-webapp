@@ -44,7 +44,7 @@ function PatientList() {
             <Breadcrumb className="">
                 <BreadcrumbList>
                     <BreadcrumbItem>
-                        <BreadcrumbLink href="/">Patients List</BreadcrumbLink>
+                        <BreadcrumbLink href="/">Patient List</BreadcrumbLink>
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>

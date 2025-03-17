@@ -11,6 +11,7 @@ import io
 import numpy as np
 
 from .services.segmentation_service import get_segmentation_prediction, process_prediction
+from .services.classification_service import get_ckd_prediction
 from .services.image_service import save_and_get_png_nifti_images
 from .services.renogram_service import generate_renogram
 from .serializers import UserSerializer, DiagnosisReportSerializer, PatientSerializer
@@ -18,6 +19,8 @@ from rest_framework import status
 from rest_framework import permissions
 from rest_framework.exceptions import NotFound
 from .models import DiagnosisReport, Patient
+from django.shortcuts import get_object_or_404
+from django.core.exceptions import MultipleObjectsReturned
 
 
 #Reports
@@ -48,13 +51,16 @@ class DiagnosisReportCreateView(generics.CreateAPIView):
         #Overlay masks on image and save as png
         #Use masks to generate renogram
         renogram_dict = generate_renogram(pixel_array=dicom_image, mask=mask_path)
+
+        #Run classification prediction
+        ckd_prediction, grad_cam_rel_path = get_ckd_prediction(image_nii_path, patient=patient.id, explanation=True)
         
         
         validated_data = serializer.validated_data
 
         instance, created = DiagnosisReport.objects.update_or_create(
             patient=patient,
-            defaults={**validated_data, "nifti_image": nifti_image, "nifti_mask": nifti_mask, "png_image": png_image, "png_image_overlay": png_image_overlay, "renogram_dict": renogram_dict}
+            defaults={**validated_data, 'ckd_prediction': ckd_prediction, "nifti_image": nifti_image, "nifti_mask": nifti_mask, "png_image": png_image, "png_image_overlay": png_image_overlay, "renogram_dict": renogram_dict, "grad_cam": grad_cam_rel_path}
         )
         
         if created:
@@ -69,8 +75,9 @@ class DiagnosisReportDetailView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
-        obj = DiagnosisReport.objects.get(patient = self.kwargs['patient_id'])
+        obj = get_object_or_404(DiagnosisReport, patient=self.kwargs['patient_id'])
         return obj
+
     
 class DiagnosisReportDelete(generics.DestroyAPIView):
     queryset = DiagnosisReport.objects.all()

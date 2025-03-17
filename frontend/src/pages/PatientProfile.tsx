@@ -13,6 +13,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DiagnosisForm from "@/components/DiagnosisForm";
 import DiagnosisDashboard from "@/components/DiagnosisDashboard";
+import ExplanationDashboard from "@/components/ExplanationDashboard";
 import { Separator } from "@/components/ui/separator";
 
 function PatientProfile() {
@@ -63,11 +64,11 @@ function PatientProfile() {
                             Upload Data
                         </TabsTrigger>
                     </TabsList>
-                    <TabsContent value="diagnosis" className="flex flex-row max-w-full justify-center">
+                    <TabsContent value="diagnosis" className=" max-w-full justify-center">
                         <DiagnosisDashboard patient_id={id}/>
                     </TabsContent>
-                    <TabsContent value="explanation" className="flex flex-row max-w-full justify-center">
-                        <h3>XAI explanation here</h3>
+                    <TabsContent value="explanation" className="max-w-full justify-center">
+                        <ExplanationDashboard patient_id={id}/>
                     </TabsContent>
                     <TabsContent value="uploadData">
                             <DiagnosisForm patient_id={id} />

@@ -84,26 +84,27 @@ def process_prediction(model_output, image, patient):
              cv2.drawContours(overlay_img, kidney_contours[1]["contour"], -1, (0, 0, 255), 1)
              
              #Fill in the masks
-             cv2.drawContours(mask, kidney_contours[0]["contour"], -1, 1, cv2.FILLED)
-             cv2.drawContours(mask, kidney_contours[1]["contour"], -1, 2, cv2.FILLED)
+             #cv2.fillPoly(mask)
+             cv2.drawContours(mask, [kidney_contours[0]["contour"]], -1, color=1, thickness=cv2.FILLED)
+             cv2.drawContours(mask, [kidney_contours[1]["contour"]], -1, color=2, thickness=cv2.FILLED)
         else:
-            cv2.drawContours(overlay_img, kidney_contours[0]["contour"], -1, (0, 0, 255), 1)
-            cv2.drawContours(overlay_img, kidney_contours[1]["contour"], -1, (255, 0, 0), 1)
+            cv2.drawContours(overlay_img, [kidney_contours[0]["contour"]], -1, (0, 0, 255), 1)
+            cv2.drawContours(overlay_img, [kidney_contours[1]["contour"]], -1, (255, 0, 0), 1)
             #Fill in the mask
-            cv2.drawContours(mask, kidney_contours[0]["contour"], -1, 2, cv2.FILLED)
-            cv2.drawContours(mask, kidney_contours[1]["contour"], -1, 1, cv2.FILLED)
+            cv2.drawContours(mask, [kidney_contours[0]["contour"]], -1, color=2, thickness=cv2.FILLED)
+            cv2.drawContours(mask, [kidney_contours[1]["contour"]], -1, color=1, thickness=cv2.FILLED)
     
     if len(kidney_contours) == 1:
         if kidney_contours[0]["center_point_x"] < 64:
             cv2.drawContours(overlay_img, kidney_contours[0]["contour"], -1, (255, 0, 0), 1)
-            cv2.drawContours(mask, kidney_contours[0]["contour"], -1, 1, cv2.FILLED)
+            cv2.drawContours(mask, kidney_contours[0]["contour"], -1, color=1,  thickness=cv2.FILLED)
         else:
             cv2.drawContours(overlay_img, kidney_contours[0]["contour"], -1, (0, 0, 255), 1)
-            cv2.drawContours(mask, kidney_contours[0]["contour"], -1, 2, cv2.FILLED)
+            cv2.drawContours(mask, kidney_contours[0]["contour"], -1, color=2,  thickness=cv2.FILLED)
 
     output_path = os.path.join(settings.MEDIA_ROOT, f"data/patient_{patient}/")
     nifti_mask = nib.Nifti1Image(mask, affine=np.eye(4))
-    mask_path = os.path.join(output_path, f"image.nii.gz")
+    mask_path = os.path.join(output_path, f"mask.nii.gz")
     nib.save(nifti_mask, mask_path)
 
 
@@ -118,7 +119,7 @@ def process_prediction(model_output, image, patient):
 
 
     overlay_image_rel_path = f"data/patient_{patient}/overlay_image.png"
-    mask_rel_path = f"data/patient_{patient}/image.nii.gz"
+    mask_rel_path = f"data/patient_{patient}/mask.nii.gz"
 
     return overlay_image_rel_path, mask_rel_path, mask_path
     
