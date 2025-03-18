@@ -35,7 +35,7 @@ function ExplanationDashboard({ patient_id }: ExplanationDashboardProps) {
             </p>
             <div className="flex flex-col justify-center mt-6 ml-2">
             <h3 className="font-semibold text-2xl mt-2 text-center" >
-                XAI Explanation of CKD Stage Prediction
+                Grad CAM ++ Heatmap
             </h3>
             <p className="text-gray-600 text-center mb-2">
                 The red areas are important for the model in the decision making process.

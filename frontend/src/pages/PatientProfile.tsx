@@ -39,7 +39,7 @@ function PatientProfile() {
             <Breadcrumb>
                 <BreadcrumbList>
                     <BreadcrumbItem>
-                        <BreadcrumbLink href="/">Patients List</BreadcrumbLink>
+                        <BreadcrumbLink href="/">Patient List</BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
