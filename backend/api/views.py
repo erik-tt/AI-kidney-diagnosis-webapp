@@ -110,6 +110,14 @@ class PatientGetPatientView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Patient.objects.all()
 
+class PatientDeleteView(generics.DestroyAPIView):
+    serializer_class = PatientSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Patient.objects.filter(doctor=user)
+
 
 #User
 class CreateUserView(generics.CreateAPIView):

@@ -11,4 +11,5 @@ urlpatterns = [
     path('patients/', views.PatientGetPatientsView.as_view()),
     path('patients/<int:pk>/', views.PatientGetPatientView.as_view()),
     path('patients/create/', views.PatientCreateView.as_view()),
+    path('patients/delete/<int:pk>/', views.PatientDeleteView.as_view())
 ]

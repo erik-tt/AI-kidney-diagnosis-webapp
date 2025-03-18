@@ -30,6 +30,7 @@ function ExplanationDashboard({ patient_id }: ExplanationDashboardProps) {
            <h2 className="font-semibold text-2xl mt-2 mb-2">
                 XAI Explanation of CKD Stage Prediction
             </h2>
+            {report ? <div>
             <p className="text-gray-600">
                 This page provides an explanation for the CKD stage prediction XAI stands for explanable AI. This page shows the output of Grad CAM ++, a XAI model that outputs a heatmap of what the deep learning model making the prediction focuses on.
             </p>
@@ -49,6 +50,7 @@ function ExplanationDashboard({ patient_id }: ExplanationDashboardProps) {
                                         className="mx-auto align-middle w-94 h-94"
                                     />
             </div>
+            </div> : <p>Upload data to get an explanation</p>}
         </div>
     );
 }

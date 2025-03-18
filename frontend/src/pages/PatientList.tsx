@@ -30,14 +30,19 @@ function PatientList() {
     }, []);
 
     const getPatients = () => {
-        api.get("api/patients/")
+       api.get("api/patients/")
             .then((res) => res.data)
             .then((data) => {
                 setPatients(data);
-                console.log(data);
             })
             .catch((err) => alert(err));
     };
+
+    const deletePatients = async (id : string) => {
+        await api.delete(`api/patients/delete/${id}/`)
+        getPatients()
+    }
+
 
     return (
         <div className="relative overflow-x-auto max-w-7xl mx-auto mt-10 p-2">
@@ -74,7 +79,17 @@ function PatientList() {
                                 >
                                     Patient Profile
                                 </Button>
+                                <Button
+                                    onClick={() =>
+                                        deletePatients(patient.id)
+                                    }
+                                    className="ml-4 hover:bg-red-400"
+                                    variant="outline"
+                                >
+                                    Delete
+                                </Button>
                             </TableCell>
+                            
                         </TableRow>
                     </TableBody>
                 ))}
