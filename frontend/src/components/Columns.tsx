@@ -32,7 +32,7 @@ export const columns: ColumnDef<Patient>[] = [
       const navigate = useNavigate();
       return (
         <div>
-            <Button
+            <Button variant="outline"
                 onClick={() =>
                     navigate(`/patients/${patient.id}`)
                 }

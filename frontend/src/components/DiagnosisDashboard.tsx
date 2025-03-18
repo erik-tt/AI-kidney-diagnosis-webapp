@@ -25,6 +25,24 @@ function DiagnosisDashboard({ patient_id }: DiagnosisDashboardProps) {
         }
     };
 
+    const getCKDDescription = () => {
+        if (report?.ckd_prediction == 5) {
+            return <p className="text-gray-600 text-xs">GFR levels close to failure</p>
+        }
+        if (report?.ckd_prediction == 4) {
+            return <p className="text-gray-600 text-xs">GFR is severly decreased</p>
+        }
+        if (report?.ckd_prediction == 3) {
+            return <p className="text-gray-600 text-xs">GFR is severly decreased</p>
+        }
+        if (report?.ckd_prediction == 2) {
+            return <p className="text-gray-600 text-xs">GFR is slightly decreased</p>
+        }
+        if (report?.ckd_prediction == 1) {
+            return <p className="text-gray-600 text-xs">GFR is normal</p>
+        }
+    }
+
     return (
         <div>
             <h2 className="font-semibold text-2xl mt-2 mb-2">
@@ -33,17 +51,18 @@ function DiagnosisDashboard({ patient_id }: DiagnosisDashboardProps) {
 
             {report ? (
                 <div className="w-full">
-                    <div className="flex flex-row">
-                        <div className="flex flex-col p-8 rounded-2xl shadow-sm">
-                            <p className="font-semibold text-2xl">
+                    <div className="flex flex-row mb-2">
+                        <div className="flex flex-col p-8 px-12 rounded-2xl shadow-sm outline-1">
+                            <p className="text-gray-800 text-lg">Predicted CKD stage</p>
+                            <p className="font-semibold text-4xl mb-4">
                                 {report?.ckd_prediction}
-                            </p>
-                            <p>Predicted CKD Stage</p>
+                            </p>    
+                            {getCKDDescription()}
                         </div>
                     </div>
                     <div className="flex flex-row">
-                        <div className="flex-1 p-2 m-1 rounded-2xl shadow-sm text-center bg-white">
-                            <h3 className="mt-2 font-semibold text-md">
+                        <div className="flex-1 p-2 m-1 rounded-2xl shadow-sm text-center bg-white outline-1">
+                            <h3 className="mt-2 text-gray-800 text-lg">
                                 Renogram (Time Activity Curve)
                             </h3>
                             {report?.renogram_dict ? (
@@ -52,8 +71,8 @@ function DiagnosisDashboard({ patient_id }: DiagnosisDashboardProps) {
                                 <p>could not load renogram</p>
                             )}
                         </div>
-                        <div className="flex-1 p-2 m-1 rounded-2xl shadow-sm text-center bg-white">
-                            <h3 className="mt-2 font-semibold text-md">
+                        <div className="flex-1 p-2 m-1 rounded-2xl shadow-sm text-center bg-white outline-1">
+                            <h3 className="mt-2 text-gray-800 text-lg">
                                 Segmented ROIs 1-3 min post injection
                             </h3>
                             {report?.png_image_overlay ? (

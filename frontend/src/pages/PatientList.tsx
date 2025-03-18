@@ -44,7 +44,7 @@ function PatientList() {
             <PatientTable columns={columns} data={patients}/>
             <Dialog>
                 <DialogTrigger asChild>
-                    <Button variant="outline" className="mt-2 ">
+                    <Button className="mt-2 ">
                         Register New Patient
                     </Button>
                 </DialogTrigger>
