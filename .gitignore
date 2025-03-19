@@ -174,5 +174,3 @@ cython_debug/
 backend/media
 
 .DS_Store
-
-models/
