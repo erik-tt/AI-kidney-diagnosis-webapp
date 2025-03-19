@@ -8,3 +8,14 @@ services:
       - ./backend:/backend
     command: bash -c "python manage.py runserver 0.0.0.0:8000"
 
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/frontend
+      - node_modules:/frontend/node_modules
+
+volumes:
+  pgdata: {}
+  node_modules: {}
