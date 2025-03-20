@@ -16,10 +16,10 @@ function PatientForm({ getPatients } : PatientFormProps) {
     const [lastName, setLastName] = useState("");
     const [gender, setGender] = useState("F");
     const [dateOfBirth, setDateOfBirth] = useState("");
-    const [loading, setLoading] = useState(false);
+    //const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        setLoading(true);
+        //setLoading(true);
         e.preventDefault();
 
         const payload = {
@@ -35,9 +35,9 @@ function PatientForm({ getPatients } : PatientFormProps) {
                 alert("Registered new patient");
             } else alert("failed to register");
         } catch (error) {
-            alert(error);
+            alert("an error occured when registering");
         } finally {
-            setLoading(false);
+            //setLoading(false);
             getPatients()
         }
     };
@@ -89,6 +89,10 @@ function PatientForm({ getPatients } : PatientFormProps) {
                     </DialogClose>
                 </DialogFooter>
             </form>
+            <div className="mt-2 text-sm text-center tracking-tight text-gray-500">
+                    <p className="font-bold text-red-600 ">Disclaimer: </p>
+                    <p>This site is a research project. Do not upload personal health information data to this site! </p>
+            </div>
         </div>
     );
 }
