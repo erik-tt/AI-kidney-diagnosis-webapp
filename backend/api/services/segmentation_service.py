@@ -1,4 +1,5 @@
 import os
+import io
 from monai.networks.nets import SwinUNETR
 from monai.transforms import (
     Compose,
@@ -12,6 +13,7 @@ import torch
 import nibabel as nib
 from django.conf import settings
 import cv2
+from PIL import Image
 
 model =  SwinUNETR(
             img_size=[128, 128],
@@ -49,7 +51,7 @@ def get_segmentation_prediction(image_path):
 
 
 #Draws the contours and filter out any extra clusters of predicted kidneys
-def process_prediction(model_output, image, patient):
+def process_prediction(model_output, image):
     overlay_img = cv2.imread(image)
     output =np.array(model_output, dtype=np.uint8)
 
@@ -102,26 +104,14 @@ def process_prediction(model_output, image, patient):
             cv2.drawContours(overlay_img, kidney_contours[0]["contour"], -1, (0, 0, 255), 1)
             cv2.drawContours(mask, kidney_contours[0]["contour"], -1, color=2,  thickness=cv2.FILLED)
 
-    output_path = os.path.join(settings.MEDIA_ROOT, f"data/patient_{patient}/")
     nifti_mask = nib.Nifti1Image(mask, affine=np.eye(4))
-    mask_path = os.path.join(output_path, f"mask.nii.gz")
-    nib.save(nifti_mask, mask_path)
 
+    overlay_img = Image.fromarray(overlay_img)
+    overlay_buffer = io.BytesIO()
+    overlay_img.save(overlay_buffer, format="PNG")
+    overlay_buffer.seek(0)
 
-    #cv2.drawContours(overlay_img, contour, -1, (255, 255, 255), 1)
-    overlay_image_png_path = os.path.join(output_path, f"overlay_image.png")
-    cv2.imwrite(overlay_image_png_path, overlay_img)
-
-
-    output_path = os.path.join(settings.MEDIA_ROOT, f"data/patient_{patient}/")
-    overlay_image_png_path = os.path.join(output_path, f"overlay_image.png")
-    cv2.imwrite(overlay_image_png_path, overlay_img)
-
-
-    overlay_image_rel_path = f"data/patient_{patient}/overlay_image.png"
-    mask_rel_path = f"data/patient_{patient}/mask.nii.gz"
-
-    return overlay_image_rel_path, mask_rel_path, mask_path
+    return overlay_buffer, nifti_mask
     
 
     

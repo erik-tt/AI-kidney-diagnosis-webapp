@@ -12,7 +12,7 @@ import numpy as np
 
 from .services.segmentation_service import get_segmentation_prediction, process_prediction
 from .services.classification_service import get_ckd_prediction
-from .services.image_service import save_and_get_png_nifti_images
+from .services.image_service import get_nifti_img_path, get_avg_png_buffer, cleanup_tmp
 from .services.renogram_service import generate_renogram
 from .serializers import UserSerializer, DiagnosisReportSerializer, PatientSerializer
 from rest_framework import status
@@ -21,6 +21,7 @@ from rest_framework.exceptions import NotFound
 from .models import DiagnosisReport, Patient
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import MultipleObjectsReturned
+from django.core.files.storage import default_storage
 
 
 #Reports
@@ -33,40 +34,62 @@ class DiagnosisReportCreateView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        #Get the pixel array
+
         dicom_file = self.request.FILES.get("dicom_file")
         dicom_image = pydicom.dcmread(io.BytesIO(dicom_file.read())).pixel_array.astype(np.float32)
-        
-        #Handle images
+
         patient = serializer.validated_data.get("patient")
-        image_nii_rel_path, image_nii_path, image_png_rel_path, image_png_path = save_and_get_png_nifti_images(dicom_image=dicom_image, patient=patient.id)
-        nifti_image = image_nii_rel_path
-        png_image = image_png_rel_path
+    
+        #Handle images
+        avg_array = np.mean(dicom_image[6:18], axis=0)
+        #Get nifti image for segmentation (stored to tmp)
+        image_nii_path = get_nifti_img_path(avg_pixel_array=avg_array)
+        #Get png buffer for overlay
+        image_png_path= get_avg_png_buffer(avg_pixel_array=avg_array)
+
         
         #Run ML segmentation prediction algorithm
         pixel_array_model_output = get_segmentation_prediction(image_nii_path)
-        png_image_overlay, mask_rel_path, mask_path = process_prediction(model_output=pixel_array_model_output, image=image_png_path, patient=patient.id)
 
-        nifti_mask = mask_rel_path
+        overlay_buffer, nifti_mask = process_prediction(model_output=pixel_array_model_output, image=image_png_path)
+        overlay_image = ContentFile(overlay_buffer.getvalue(), name='overlay.png')
+        overlay_buffer.close()
+
         #Overlay masks on image and save as png
         #Use masks to generate renogram
-        renogram_dict = generate_renogram(pixel_array=dicom_image, mask=mask_path)
+        renogram_dict = generate_renogram(pixel_array=dicom_image, mask=nifti_mask)
 
         #Run classification prediction
-        ckd_prediction, grad_cam_rel_path = get_ckd_prediction(image_nii_path, patient=patient.id, explanation=True)
-        
-        
-        validated_data = serializer.validated_data
+        ckd_prediction, grad_cam_buffer = get_ckd_prediction(image_nii_path, explanation=True)
 
-        instance, created = DiagnosisReport.objects.update_or_create(
-            patient=patient,
-            defaults={**validated_data, 'ckd_prediction': ckd_prediction, "nifti_image": nifti_image, "nifti_mask": nifti_mask, "png_image": png_image, "png_image_overlay": png_image_overlay, "renogram_dict": renogram_dict, "grad_cam": grad_cam_rel_path}
-        )
+        #If the grad cam buffer is not none (it is none if explanation = False), process and save it
+        if grad_cam_buffer:
+            grad_cam_image = ContentFile(grad_cam_buffer.getvalue(), name='grad_cam.png')
+            grad_cam_buffer.close()
+
+            validated_data = serializer.validated_data
+            instance, created = DiagnosisReport.objects.update_or_create(
+                patient=patient,
+                defaults={**validated_data, 'ckd_prediction': ckd_prediction, "renogram_dict": renogram_dict, "png_image_overlay": overlay_image, 'grad_cam':  grad_cam_image}
+            )
+    
+        else:
+            validated_data = serializer.validated_data
+            instance, created = DiagnosisReport.objects.update_or_create(
+                patient=patient,
+                defaults={**validated_data, 'ckd_prediction': ckd_prediction, "renogram_dict": renogram_dict, "png_image_overlay": overlay_image}
+            )
+        
+        #Clean up tmp directory
+        cleanup_tmp()
+
+        print(default_storage.__class__.__name__)
         
         if created:
             return Response({"message": f"Created new report for {patient.last_name}" }, status=status.HTTP_201_CREATED)
         else:
             return Response({"message": f"updated report for {patient.last_name}" },status=status.HTTP_200_OK)
+    
 
 
 

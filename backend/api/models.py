@@ -20,7 +20,7 @@ class Patient(models.Model):
         return f"Patient information for {self.last_name}"
 
 def report_directory_path(instance, filename):
-    return 'patient_{0}/{1}'.format(instance.patient.id, filename)
+    return f'patient_{instance.patient.id}/{filename}'
 
 class DiagnosisReport(models.Model):
     #Mask prediction
