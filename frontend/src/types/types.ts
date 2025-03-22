@@ -1,5 +1,3 @@
-import { Url } from "url"
-
 export interface Patient {
     id: string,
     first_name: string,
