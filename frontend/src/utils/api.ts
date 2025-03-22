@@ -1,8 +1,13 @@
 import axios from "axios"
 import { ACCESS_TOKEN } from "../constants"
 
+const apiUrl = "/ai-kidney-diagnosis-webapp-back2"
+//Things to try
+    //Make sure frontend and backend are on the same port (8080 or 8000?)
+    //get it to use this apiUrl
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL
+    baseURL: import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL : apiUrl
 })
 
 api.interceptors.request.use(
