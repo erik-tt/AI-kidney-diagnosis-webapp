@@ -75,7 +75,7 @@ def get_ckd_prediction(niftii_path, explanation = True):
         img_pixel_array = np.array(img.dataobj)
         
         #Inverts it as it looks like grad cam++ from monai have high values for low priorities. Look into this and remove this if necessary.
-        grad_cam_im = 1- grad_cam_im
+        #grad_cam_im = 1- grad_cam_im
 
         # Normalize Grad-CAM and image to range [0, 255]
         heatmap = cv2.normalize(grad_cam_im.squeeze(), None, 0, 255, cv2.NORM_MINMAX)

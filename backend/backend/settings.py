@@ -176,7 +176,7 @@ if S3_STORAGE:
     AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
     AWS_STORAGE_BUCKET_NAME = "master-thesis-bucket"
     AWS_S3_REGION_NAME = "ams3"
-    AWS_DEFAULT_ACL = None
+    AWS_DEFAULT_ACL = 'private'
     AWS_S3_ENDPOINT_URL = "https://ams3.digitaloceanspaces.com"
     AWS_S3_OBJECT_PARAMETERS = { "CacheControl": "max-age=86400" }
 
@@ -195,6 +195,7 @@ if S3_STORAGE:
             'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage',
         },
     }
+    AWS_QUERYSTRING_EXPIRE = "3600"
 else:
     STATIC_URL = 'static/'
     MEDIA_URL = "/media/"
