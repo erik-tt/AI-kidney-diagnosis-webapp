@@ -61,6 +61,7 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 migrations
+*.pyc
 
 # Flask stuff:
 instance/
@@ -174,5 +175,3 @@ cython_debug/
 backend/media
 
 .DS_Store
-
-models/

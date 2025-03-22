@@ -79,9 +79,7 @@ function DiagnosisDashboard({ patient_id }: DiagnosisDashboardProps) {
                                 <div className="flex justify-center mt-6 ml-2">
                                     <img
                                         src={
-                                            report?.png_image_overlay +
-                                            "?" +
-                                            Date.now()
+                                            report?.png_image_overlay
                                         }
                                         className="mx-auto align-middle w-94 h-94"
                                     />

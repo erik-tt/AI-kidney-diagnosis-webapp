@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 function Register() {
     const [username, setUsername] = useState<string>("");
     const [password, setPassword] = useState<string>("");
-    const [loading, setLoading] = useState<boolean>(false);
+    //const [loading, setLoading] = useState<boolean>(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -13,7 +13,7 @@ function Register() {
     }, []);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        setLoading(true);
+        //setLoading(true);
         e.preventDefault();
 
         try {
@@ -22,10 +22,13 @@ function Register() {
                 password,
             });
             navigate("/login");
+            if (res.status != 201) {
+                alert("failed to register user")
+            }
         } catch (error) {
             alert(error);
         } finally {
-            setLoading(false);
+            //setLoading(false);
         }
     };
 
@@ -60,7 +63,7 @@ function Register() {
                     />
                 </div>
                 <button
-                    className="flex w-full justify-center rounded-md bg-gray-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-gray-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
+                    className="flex w-full justify-center rounded-md bg-black px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-gray-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
                     type="submit"
                 >
                     Register
@@ -76,6 +79,10 @@ function Register() {
                     Login
                 </a>
             </p>
+            <div className="mt-2 text-sm  text-center  tracking-tight text-gray-500">
+                    <p className="font-bold text-red-600 ">Disclaimer: </p>
+                    <p>This site is a research project. Do not upload personal health information data to this site! </p>
+            </div>
         </div>
     );
 }

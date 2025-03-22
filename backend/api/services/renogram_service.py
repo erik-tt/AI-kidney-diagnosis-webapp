@@ -7,9 +7,8 @@ import matplotlib.pyplot as plt
 # For testing
 
 def generate_renogram(pixel_array, mask):
-    nii_file = nib.load(mask)
 
-    label_data = nii_file.get_fdata()
+    label_data = mask.get_fdata()
     label_data = np.squeeze(label_data)
 
     roi_labels = np.unique(label_data)

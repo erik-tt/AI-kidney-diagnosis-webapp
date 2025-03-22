@@ -22,12 +22,12 @@ function PatientList() {
     }, []);
 
     const getPatients = () => {
-       api.get("api/patients/")
-            .then((res) => res.data)
-            .then((data) => {
-                setPatients(data);
-            })
-            .catch((err) => alert(err));
+        api.get("api/patients/")
+        .then((res) => res.data)
+        .then((data) => {
+            setPatients(data);
+        })
+        .catch(() => alert("an error occured"));
     };
 
 

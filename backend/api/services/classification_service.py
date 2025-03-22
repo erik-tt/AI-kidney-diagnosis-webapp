@@ -1,3 +1,4 @@
+import io
 import os
 from django.conf import settings
 from monai.networks.nets import TorchVisionFCModel
@@ -15,6 +16,7 @@ import torch
 from monai.visualize import GradCAMpp
 import nibabel as nib
 import cv2
+from PIL import Image
 
 #Load a trained model and set it to inference mode
 #Change model to match the model path
@@ -49,14 +51,14 @@ def transform_image(image_path):
 
 
 #TODO send in the dicom file and process it to handle a more advanced classification algo
-def get_ckd_prediction(niftii_path, patient, explanation = True):
+def get_ckd_prediction(niftii_path, explanation = True):
     
     tensor = transform_image(niftii_path)
     output = model(tensor)
 
     output = torch.argmax(output, dim=1).item()
 
-    grad_cam_path = None
+    buffer = None
 
     #grad cam
     if explanation:
@@ -73,7 +75,7 @@ def get_ckd_prediction(niftii_path, patient, explanation = True):
         img_pixel_array = np.array(img.dataobj)
         
         #Inverts it as it looks like grad cam++ from monai have high values for low priorities. Look into this and remove this if necessary.
-        grad_cam_im = 1- grad_cam_im
+        #grad_cam_im = 1- grad_cam_im
 
         # Normalize Grad-CAM and image to range [0, 255]
         heatmap = cv2.normalize(grad_cam_im.squeeze(), None, 0, 255, cv2.NORM_MINMAX)
@@ -87,10 +89,11 @@ def get_ckd_prediction(niftii_path, patient, explanation = True):
         
         # Blend heatmap with the original image
         overlay = cv2.addWeighted(img_pixel_array, 0.7, heatmap, 0.3, 0)
+        grad_cam_im = Image.fromarray(overlay)
+        buffer = io.BytesIO()
+        grad_cam_im.save(buffer, format="PNG")
+        buffer.seek(0)
 
         # Save the final image
-        grad_cam_path = os.path.join(settings.MEDIA_ROOT, f"data/patient_{patient}/grad_cam.png")
-        cv2.imwrite(grad_cam_path, overlay)
-        grad_cam_rel_path = f"data/patient_{patient}/grad_cam.png"
 
-    return output, grad_cam_rel_path
+    return output, buffer

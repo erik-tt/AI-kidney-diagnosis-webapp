@@ -14,6 +14,10 @@ from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv, find_dotenv
 import os
+from django.core.management.utils import get_random_secret_key
+import sys
+import dj_database_url
+from storages.backends.s3boto3 import S3Boto3Storage
 
 load_dotenv(find_dotenv())
 
@@ -25,12 +29,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ['SECRET_KEY']
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS =  os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -57,7 +61,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'api',
-    "corsheaders"
+    "corsheaders",
+    'storages'
 ]
 
 MIDDLEWARE = [
@@ -94,13 +99,22 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+#This is a helper variable that you will use to determine when to connect to your Postgres database and when to connect to a local SQLite database for testing.
+DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "False") == "True"
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if DEVELOPMENT_MODE is True:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        }
     }
-}
+elif len(sys.argv) > 0 and sys.argv[1] != 'collectstatic':
+    if os.getenv("DATABASE_URL", None) is None:
+        raise Exception("DATABASE_URL environment variable not defined")
+    DATABASES = {
+        "default": dj_database_url.parse(os.environ.get("DATABASE_URL")),
+    }
 
 
 # Password validation
@@ -137,8 +151,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -155,5 +167,36 @@ CORS_ALLOW_METHODS = [
     'OPTIONS',
 ]
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT=os.path.join(BASE_DIR,"media/")
+S3_STORAGE = (os.getenv("S3_STORAGE", "True") == "True")
+
+
+if S3_STORAGE:
+    #Media files with DO Spaces
+    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+    AWS_STORAGE_BUCKET_NAME = "master-thesis-bucket"
+    AWS_S3_REGION_NAME = "ams3"
+    AWS_DEFAULT_ACL = 'private'
+    AWS_S3_ENDPOINT_URL = "https://ams3.digitaloceanspaces.com"
+    AWS_S3_OBJECT_PARAMETERS = { "CacheControl": "max-age=86400" }
+
+    STATICFILES_LOCATION = 'static'
+    MEDIAFILES_LOCATION = 'media'
+
+    STATIC_URL = '%s/%s/' % ("https://master-thesis-bucket.ams3.digitaloceanspaces.com", STATICFILES_LOCATION)
+    MEDIA_URL =  "https://master-thesis-bucket.ams3.digitaloceanspaces.com/"
+
+
+    STORAGES = {
+        'default': {
+            'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage',
+        },
+        'staticfiles': {
+            'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage',
+        },
+    }
+    AWS_QUERYSTRING_EXPIRE = "3600"
+else:
+    STATIC_URL = 'static/'
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT=os.path.join(BASE_DIR,"media/")

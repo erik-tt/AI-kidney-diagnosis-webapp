@@ -43,9 +43,7 @@ function ExplanationDashboard({ patient_id }: ExplanationDashboardProps) {
             </p>
                                     <img
                                         src={
-                                            report?.grad_cam +
-                                            "?" +
-                                            Date.now()
+                                            report?.grad_cam
                                         }
                                         className="mx-auto align-middle w-94 h-94"
                                     />
