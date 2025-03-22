@@ -5,6 +5,7 @@ import path from "path";
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/ai-kidney-diagnosis-webapp-fron2/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
