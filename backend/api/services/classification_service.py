@@ -18,18 +18,6 @@ import nibabel as nib
 import cv2
 from PIL import Image
 
-#Load a trained model and set it to inference mode
-#Change model to match the model path
-model = TorchVisionFCModel(
-        model_name='resnet18',
-        num_classes=5,
-        pretrained=True
-)
-
-#change it to be torch script
-model.load_state_dict(torch.load(os.path.join(settings.BASE_DIR ,'api/services/models/classification/checkpoint_resnet18.pth'), weights_only=False, map_location=torch.device('cpu'))["model_state_dict"]) # This line uses .load() to read a .pth file and load the network weights on to the architecture.
-model.eval()
-
 #TODO create a better structure for transformations
 def transform_image(image_path):
     transform_load = Compose([
@@ -52,7 +40,18 @@ def transform_image(image_path):
 
 #TODO send in the dicom file and process it to handle a more advanced classification algo
 def get_ckd_prediction(niftii_path, explanation = True):
-    
+    #Load a trained model and set it to inference mode
+    #Change model to match the model path
+    model = TorchVisionFCModel(
+            model_name='resnet18',
+            num_classes=5,
+            pretrained=True
+    )
+
+    #change it to be torch script
+    model.load_state_dict(torch.load(os.path.join(settings.BASE_DIR ,'api/services/models/classification/checkpoint_resnet18.pth'), weights_only=False, map_location=torch.device('cpu'))["model_state_dict"]) # This line uses .load() to read a .pth file and load the network weights on to the architecture.
+    model.eval()
+        
     tensor = transform_image(niftii_path)
     output = model(tensor)
 
