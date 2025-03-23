@@ -20,7 +20,7 @@ function Logout() {
 
 function App() {
     return (
-        <BrowserRouter basename="/ai-kidney-diagnosis-webapp-fron2/">
+        <BrowserRouter basename="/ai-kidney-diagnosis-webapp-fron2">
             <Header />
             <Routes>
                 <Route
