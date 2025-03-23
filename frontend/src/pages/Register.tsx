@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../utils/api";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Register() {
     const [username, setUsername] = useState<string>("");
@@ -71,13 +71,12 @@ function Register() {
             </form>
             <p className="mt-10 text-center text-sm/6 text-gray-500">
                 Already have an account?
-                <a
-                    href="/login"
+                <Link to="/login"
                     className="font-semibold text-gray-600 hover:text-gray-500"
                 >
                     {" "}
                     Login
-                </a>
+                </Link>
             </p>
             <div className="mt-2 text-sm  text-center  tracking-tight text-gray-500">
                     <p className="font-bold text-red-600 ">Disclaimer: </p>

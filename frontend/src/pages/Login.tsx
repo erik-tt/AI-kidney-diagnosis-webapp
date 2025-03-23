@@ -2,6 +2,7 @@ import { useState } from "react";
 import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
+import { Link } from 'react-router-dom';
 
 
 function Login() {
@@ -68,13 +69,12 @@ function Login() {
             </form>
             <p className="mt-10 text-center text-sm/6 text-gray-500">
                 Do not have an account?
-                <a
-                    href="/register"
+                <Link to="/register"
                     className="font-semibold text-gray-600 hover:text-gray-500"
                 >
                     {" "}
                     Register
-                </a>
+                </Link>
             </p>
             <div className="mt-2 text-sm text-center tracking-tight text-gray-500">
                     <p className="font-bold text-red-600 ">Disclaimer: </p>
