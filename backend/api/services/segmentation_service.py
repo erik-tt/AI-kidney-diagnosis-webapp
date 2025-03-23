@@ -15,17 +15,6 @@ from django.conf import settings
 import cv2
 from PIL import Image
 
-model =  SwinUNETR(
-            img_size=[128, 128],
-            spatial_dims=2,
-            in_channels=1,
-            out_channels=2,
-            use_v2 = True
-        )
-
-#change it to be torch script
-model.load_state_dict(torch.load(os.path.join(settings.BASE_DIR ,'api/services/models/segmentation/checkpoint_swinunetrv2.pth'), weights_only=False, map_location=torch.device('cpu'))["model_state_dict"]) # This line uses .load() to read a .pth file and load the network weights on to the architecture.
-model.eval()
 
 def transform_image(image_path):
     transforms = Compose([
@@ -40,6 +29,18 @@ def transform_image(image_path):
 
 
 def get_segmentation_prediction(image_path):
+    model =  SwinUNETR(
+            img_size=[128, 128],
+            spatial_dims=2,
+            in_channels=1,
+            out_channels=2,
+            use_v2 = True
+        )
+
+    #change it to be torch script
+    model.load_state_dict(torch.load(os.path.join(settings.BASE_DIR ,'api/services/models/segmentation/checkpoint_swinunetrv2.pth'), weights_only=False, map_location=torch.device('cpu'))["model_state_dict"]) # This line uses .load() to read a .pth file and load the network weights on to the architecture.
+    model.eval()
+
     tensor = transform_image(image_path)
     output = model(tensor)
     output = torch.argmax(output, dim=1).squeeze(0)
