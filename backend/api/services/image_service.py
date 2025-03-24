@@ -1,4 +1,3 @@
-import io
 import os
 import shutil
 from django.conf import settings

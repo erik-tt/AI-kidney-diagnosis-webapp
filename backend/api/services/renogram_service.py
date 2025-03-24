@@ -1,8 +1,4 @@
-import io
-import nibabel as nib
-import pydicom
 import numpy as np
-import matplotlib.pyplot as plt
 
 # For testing
 
