@@ -8,4 +8,4 @@ RUN chmod +x build.sh
 RUN ./build.sh
 
 EXPOSE 8000
-CMD ["gunicorn", "--workers", "3", "backend.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "backend.wsgi:application", "--bind", "0.0.0.0:8000"]
