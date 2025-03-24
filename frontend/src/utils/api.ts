@@ -1,7 +1,7 @@
 import axios from "axios"
 import { ACCESS_TOKEN } from "../constants"
 
-const apiUrl = "/ai-kidney-diagnosis-webapp-back2"
+const apiUrl = "/"
 //Things to try
     //Make sure frontend and backend are on the same port (8080 or 8000?)
     //get it to use this apiUrl
