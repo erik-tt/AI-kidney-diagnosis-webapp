@@ -11,7 +11,9 @@ interface DiagnosisFormProps {
 
 function DiagnosisForm({ patient_id, getReport }: DiagnosisFormProps) {
     const [file, setFile] = useState<File | null>(null);
-    //const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [isError, setIsError] = useState(false);
+    const [isComplete, setIsComplete] = useState(false);
 
     //API handling to send info to backend and register a diagnosis report
     const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,7 +22,7 @@ function DiagnosisForm({ patient_id, getReport }: DiagnosisFormProps) {
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        //setLoading(true);
+        setLoading(true);
         e.preventDefault();
 
         const formData = new FormData();
@@ -38,17 +40,18 @@ function DiagnosisForm({ patient_id, getReport }: DiagnosisFormProps) {
                 { headers: { "Content-Type": "multipart/form-data" } }
             );
             if (res.status === 201) {
-                alert("Added data");
                 getReport()
+                setIsComplete(true)
             }
             if (res.status === 200) {
-                alert("Updated data");
                 getReport()
-            } else alert("failed to send data");
+                setIsComplete(true)
+            }
         } catch (error) {
-            alert("an error occured");
+            console.log("Could not upload due to error")
+            setIsError(true)
         } finally {
-            //setLoading(false);
+            setLoading(false);
         }
     };
 
@@ -77,9 +80,16 @@ function DiagnosisForm({ patient_id, getReport }: DiagnosisFormProps) {
                         className="shadow bg-white"
                     />
                 </div>
-                <Button className="mt-2 shadow" type="submit">
+                {loading ? 
+                <Button disabled className="mt-2 shadow w-56" type="submit">
+                Analyzing...
+                </Button> :
+                <Button className="mt-2 shadow w-56" type="submit">
                     Analyze scintigraphy file
                 </Button>
+                }
+                {isComplete && <p className="text-gray-500 text-sm mt-2 w-56 text-center">Successfully analyzed file!</p>}
+                {isError && <p className="text-red-600 text-sm mt-2 w-56 text-center">Could not upload file</p>}
             </form>
             <div className="mt-2 text-sm tracking-tight text-gray-500">
                 <p className="font-bold text-red-600 ">Disclaimer: </p>
