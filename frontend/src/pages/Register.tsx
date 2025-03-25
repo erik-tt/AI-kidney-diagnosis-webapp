@@ -33,7 +33,7 @@ function Register() {
     };
 
     return (
-        <div className="flex flex-col justify-center w-96 lg:w-1/4 p-8 rounded-xl shadow-lg mx-auto mt-20 bg-white">
+        <div className="flex flex-col justify-center w-96 p-8 rounded-xl sm:shadow-lg mx-auto mt-20 bg-white">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                 <h1 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
                     Register

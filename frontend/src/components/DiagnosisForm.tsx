@@ -6,9 +6,10 @@ import api from "@/utils/api";
 
 interface DiagnosisFormProps {
     patient_id: string | undefined;
+    getReport : () => void
 }
 
-function DiagnosisForm({ patient_id }: DiagnosisFormProps) {
+function DiagnosisForm({ patient_id, getReport }: DiagnosisFormProps) {
     const [file, setFile] = useState<File | null>(null);
     //const [loading, setLoading] = useState(false);
 
@@ -38,9 +39,11 @@ function DiagnosisForm({ patient_id }: DiagnosisFormProps) {
             );
             if (res.status === 201) {
                 alert("Added data");
+                getReport()
             }
             if (res.status === 200) {
                 alert("Updated data");
+                getReport()
             } else alert("failed to send data");
         } catch (error) {
             alert("an error occured");
