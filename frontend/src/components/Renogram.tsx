@@ -19,7 +19,9 @@ function Renogram( {data} : RenogramProps) {
     <div>
         <Plot
             data={renogram_data}
-            layout={{showlegend: true }}
+            layout={{showlegend: true}}
+            style={{width: "100%", height: "100%"}}
+            useResizeHandler={true}
         />
     </div>
 )}
