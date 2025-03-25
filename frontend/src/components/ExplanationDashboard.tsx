@@ -1,29 +1,10 @@
-import api from "@/utils/api";
-import { useEffect, useState } from "react";
 import { DiagnosisReport } from "@/types/types";
 
 interface ExplanationDashboardProps {
-    patient_id: string | undefined;
+    report : DiagnosisReport | null;
 }
 
-function ExplanationDashboard({ patient_id }: ExplanationDashboardProps) {
-    //TODO: Make the reports be retrived from the page and sent in as props
-    const [report, setReport] = useState<DiagnosisReport | undefined>();
-
-    useEffect(() => {
-        getReport();
-    }, []);
-
-    const getReport = () => {
-        if (patient_id) {
-            api.get("api/diagnosis_report/" + patient_id + "/")
-                .then((res) => res.data)
-                .then((data) => {
-                    setReport(data);
-                    console.log(data);
-                });
-        }
-    };
+function ExplanationDashboard({ report }: ExplanationDashboardProps) {
 
     return (
         <div>

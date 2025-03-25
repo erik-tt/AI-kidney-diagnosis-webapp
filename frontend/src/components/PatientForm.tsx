@@ -33,7 +33,7 @@ function PatientForm({ getPatients } : PatientFormProps) {
             const res = await api.post("api/patients/create/", payload);
             if (res.status === 201) {
                 alert("Registered new patient");
-            } else alert("failed to register");
+            } else alert("failed to register patient");
         } catch (error) {
             alert("an error occured when registering");
         } finally {

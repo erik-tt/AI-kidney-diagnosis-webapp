@@ -1,7 +1,7 @@
-import { Patient } from "@/types/types";
+import { DiagnosisReport, Patient } from "@/types/types";
 import api from "@/utils/api";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import {
     Breadcrumb,
@@ -22,26 +22,39 @@ import { useNavigate } from "react-router-dom";
 function PatientProfile() {
     const { id } = useParams();
     const [patient, setPatient] = useState<Patient | null>(null);
+    const [report, setReport] = useState<DiagnosisReport | null>(null);
     const navigate = useNavigate();
     const [deleted, setDeleted] = useState<boolean>(false);
 
     useEffect(() => {
         getPatient();
+        getReport();
     }, []);
 
-    const getPatient = () => {
-        api.get("api/patients/" + id + "/")
-            .then((res) => res.data)
-            .then((data) => {
-                setPatient(data);
-                console.log(data);
-            })
-            .catch((err) => alert(err));
+    const getPatient = async () => {
+        try {
+            const response = await api.get("api/patients/" + id + "/");
+            setPatient(response.data);
+        } catch (error: any) {
+            if (error.response.status === 401) {
+                navigate("/login");
+            } else console.log("Could not get patient with id " + id);
+        }
+    };
+    const getReport = async () => {
+        try {
+            const response = await api.get("api/diagnosis_report/" + id + "/");
+            setReport(response.data);
+        } catch (error: any) {
+            if (error.response.status === 401) {
+                navigate("/login");
+            } else console.log("Could not get report for patient with id " + id);
+        }
     };
 
     const redirectHome = () => {
-        navigate("../")
-    }
+        navigate("../");
+    };
 
     const deletePatient = async () => {
         try {
@@ -66,12 +79,16 @@ function PatientProfile() {
             <Breadcrumb>
                 <BreadcrumbList>
                     <BreadcrumbItem>
-                        <BreadcrumbLink href="/">Patient List</BreadcrumbLink>
+                        <BreadcrumbLink asChild>
+                            <Link to="/">Patient List</Link>
+                        </BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                        <BreadcrumbLink href={`/patients/${id}`}>
-                            {patient?.last_name}
+                        <BreadcrumbLink>
+                            <Link to={`/patients/${id}`}>
+                                {patient?.last_name}
+                            </Link>
                         </BreadcrumbLink>
                     </BreadcrumbItem>
                 </BreadcrumbList>
@@ -126,16 +143,16 @@ function PatientProfile() {
                     value="diagnosis"
                     className=" max-w-full justify-center"
                 >
-                    <DiagnosisDashboard patient_id={id} />
+                    <DiagnosisDashboard report={report} />
                 </TabsContent>
                 <TabsContent
                     value="explanation"
                     className="max-w-full justify-center"
                 >
-                    <ExplanationDashboard patient_id={id} />
+                    <ExplanationDashboard report={report} />
                 </TabsContent>
                 <TabsContent value="uploadData">
-                    <DiagnosisForm patient_id={id} />
+                    <DiagnosisForm patient_id={id} getReport={getReport} />
                 </TabsContent>
             </Tabs>
         </div>

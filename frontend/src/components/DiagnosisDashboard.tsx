@@ -1,29 +1,11 @@
-import api from "@/utils/api";
-import { useEffect, useState } from "react";
 import { DiagnosisReport } from "@/types/types";
 import Renogram from "./Renogram";
 
 interface DiagnosisDashboardProps {
-    patient_id: string | undefined;
+    report : DiagnosisReport | null
 }
 
-function DiagnosisDashboard({ patient_id }: DiagnosisDashboardProps) {
-    const [report, setReport] = useState<DiagnosisReport | undefined>();
-
-    useEffect(() => {
-        getReport();
-    }, []);
-
-    const getReport = () => {
-        if (patient_id) {
-            api.get("api/diagnosis_report/" + patient_id + "/")
-                .then((res) => res.data)
-                .then((data) => {
-                    setReport(data);
-                    console.log(data);
-                });
-        }
-    };
+function DiagnosisDashboard({ report }: DiagnosisDashboardProps) {
 
     const getCKDDescription = () => {
         if (report?.ckd_prediction == 5) {
