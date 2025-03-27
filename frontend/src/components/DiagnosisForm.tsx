@@ -3,6 +3,7 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import api from "@/utils/api";
+import { Loader2 } from "lucide-react";
 
 interface DiagnosisFormProps {
     patient_id: string | undefined;
@@ -81,8 +82,9 @@ function DiagnosisForm({ patient_id, getReport }: DiagnosisFormProps) {
                     />
                 </div>
                 {loading ? 
-                <Button disabled className="mt-2 shadow w-56" type="submit">
-                Analyzing...
+                <Button disabled className="mt-2 shadow w-56">
+                    <Loader2 className="animate-spin" />
+                    Analyzing
                 </Button> :
                 <Button className="mt-2 shadow w-56" type="submit">
                     Analyze scintigraphy file

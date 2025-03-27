@@ -1,18 +1,21 @@
 import { useState } from "react";
 import api from "../utils/api";
-import { useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 
 function Login() {
     const [username, setUsername] = useState<string>("");
     const [password, setPassword] = useState<string>("");
-    //const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [isError, setIsError] = useState<boolean>(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-       // setLoading(true);
+        setLoading(true);
         e.preventDefault();
 
         try {
@@ -24,9 +27,9 @@ function Login() {
             localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
             navigate("/");
         } catch (error) {
-            alert(error);
+            setIsError(true)
         } finally {
-            //setLoading(false);
+            setLoading(false);
         }
     };
 
@@ -60,13 +63,26 @@ function Login() {
                         onChange={(e) => setPassword(e.target.value)}
                     />
                 </div>
-                <button
-                    className="flex w-full justify-center rounded-md bg-black px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-gray-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
-                    type="submit"
-                >
+                {loading ?
+                <Button disabled className="mt-2 shadow w-full">
+                    <Loader2 className="animate-spin" />
+                    Loading...
+                </Button> :
+                <Button className="mt-2 shadow w-full" type="submit">
                     Login
-                </button>
+                </Button>}
             </form>
+            {isError && (
+                <div className="mt-2">
+                <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>
+                        Please register user.
+                    </AlertDescription>
+                </Alert>
+                </div>
+            )}
             <p className="mt-10 text-center text-sm/6 text-gray-500">
                 Do not have an account?
                 <Link to="/register"

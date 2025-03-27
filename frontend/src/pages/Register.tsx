@@ -1,11 +1,15 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import api from "../utils/api";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from 'react-router';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 function Register() {
     const [username, setUsername] = useState<string>("");
     const [password, setPassword] = useState<string>("");
-    //const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [isError, setIsError] = useState<boolean>(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -13,27 +17,24 @@ function Register() {
     }, []);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        //setLoading(true);
+        setLoading(true);
         e.preventDefault();
 
         try {
-            const res = await api.post("api/user/register/", {
+            await api.post("api/user/register/", {
                 username,
                 password,
             });
             navigate("/login");
-            if (res.status != 201) {
-                alert("failed to register user")
-            }
         } catch (error) {
-            alert(error);
+            setIsError(true);
         } finally {
-            //setLoading(false);
+            setLoading(false);
         }
     };
 
     return (
-        <div className="flex flex-col justify-center w-96 p-8 rounded-xl sm:shadow-lg mx-auto mt-20 bg-white">
+        <div className="flex flex-col justify-center w-96 p-8 rounded-xl sm:shadow-lg mx-auto mt-20">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                 <h1 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
                     Register
@@ -62,16 +63,31 @@ function Register() {
                         onChange={(e) => setPassword(e.target.value)}
                     />
                 </div>
-                <button
-                    className="flex w-full justify-center rounded-md bg-black px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-gray-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
-                    type="submit"
-                >
+                {loading ?
+                <Button disabled className="mt-2 shadow w-full">
+                    <Loader2 className="animate-spin" />
+                    Loading...
+                </Button> :
+                <Button className="mt-2 shadow w-full" type="submit">
                     Register
-                </button>
+                </Button>}
             </form>
+            {isError && (
+                <div className="mt-2">
+                    <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Error</AlertTitle>
+                        <AlertDescription>
+                            Please try another username.
+                        </AlertDescription>
+                    </Alert>
+                </div>
+            )}
+
             <p className="mt-10 text-center text-sm/6 text-gray-500">
                 Already have an account?
-                <Link to="/login"
+                <Link
+                    to="/login"
                     className="font-semibold text-gray-600 hover:text-gray-500"
                 >
                     {" "}
@@ -79,8 +95,11 @@ function Register() {
                 </Link>
             </p>
             <div className="mt-2 text-sm  text-center  tracking-tight text-gray-500">
-                    <p className="font-bold text-red-600 ">Disclaimer: </p>
-                    <p>This site is a research project. Do not upload personal health information data to this site! </p>
+                <p className="font-bold text-red-600 ">Disclaimer: </p>
+                <p>
+                    This site is a research project. Do not upload personal
+                    health information data to this site!{" "}
+                </p>
             </div>
         </div>
     );

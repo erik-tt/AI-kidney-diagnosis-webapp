@@ -1,7 +1,7 @@
 import { DiagnosisReport, Patient } from "@/types/types";
 import api from "@/utils/api";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router";
 
 import {
     Breadcrumb,
@@ -17,7 +17,8 @@ import ExplanationDashboard from "@/components/ExplanationDashboard";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function PatientProfile() {
     const { id } = useParams();
@@ -25,6 +26,7 @@ function PatientProfile() {
     const [report, setReport] = useState<DiagnosisReport | null>(null);
     const navigate = useNavigate();
     const [deleted, setDeleted] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
         getPatient();
@@ -42,13 +44,17 @@ function PatientProfile() {
         }
     };
     const getReport = async () => {
+        setLoading(true);
         try {
             const response = await api.get("api/diagnosis_report/" + id + "/");
             setReport(response.data);
         } catch (error: any) {
             if (error.response.status === 401) {
                 navigate("/login");
-            } else console.log("Could not get report for patient with id " + id);
+            } else
+                console.log("Could not get report for patient with id " + id);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -94,10 +100,9 @@ function PatientProfile() {
                 </BreadcrumbList>
             </Breadcrumb>
             <div className="flex w-full justify-between">
-                <h2 className="font-semibold text-2xl ">
-                    {" "}
-                    {patient?.first_name} {patient?.last_name}
-                </h2>
+                    <h2 className="font-semibold text-2xl ">
+                        {patient?.first_name} {patient?.last_name}
+                    </h2>
                 <Dialog>
                     <DialogTrigger asChild>
                         <Button variant="outline" className="hover:bg-red-400">
@@ -143,13 +148,37 @@ function PatientProfile() {
                     value="diagnosis"
                     className=" max-w-full justify-center"
                 >
-                    <DiagnosisDashboard report={report} />
+                    {loading ? (
+                        <div>
+                            <Skeleton className="w-64 h-[20px] rounded-full m-2 mt-4" />
+                            <Skeleton className="w-full h-64 rounded-md m-2 mt-4" />
+                            <div className="flex">
+                                <Skeleton className="w-full h-96 rounded-md m-2" />
+                                <Skeleton className="w-full h-96 rounded-md m-2" />
+                            </div>
+                        </div>
+                    ) : (
+                        <DiagnosisDashboard report={report} />
+                    )}
                 </TabsContent>
                 <TabsContent
                     value="explanation"
                     className="max-w-full justify-center"
                 >
+                    {loading ? (
+                        <div>
+                            <Skeleton className="w-64 h-6 rounded-full m-2 mt-4" />
+                            <Skeleton className="w-full h-4 rounded-full m-2 mt-4" />
+                            <Skeleton className="w-full h-4 rounded-full m-2 mt-4" />
+                            <Skeleton className="w-full h-4 rounded-full m-2 mt-4" />
+                            <div className="flex flex-col justify-center items-center">
+                                <Skeleton className="w-84 h-6 rounded-full m-2 mt-4" />
+                                <Skeleton className="w-96 h-96 rounded-md m-2" />
+                            </div>
+                        </div>
+                    ) : (
                     <ExplanationDashboard report={report} />
+                )}
                 </TabsContent>
                 <TabsContent value="uploadData">
                     <DiagnosisForm patient_id={id} getReport={getReport} />

@@ -3,7 +3,7 @@ import {
     Routes,
     Route,
     Navigate,
-} from "react-router-dom";
+} from "react-router";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
