@@ -29,6 +29,7 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
       }
     } catch (error) {
       console.log(error);
+      setIsAuthorized(false)
     }
   };
 

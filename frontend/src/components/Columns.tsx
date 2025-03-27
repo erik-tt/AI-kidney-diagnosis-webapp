@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Patient } from "../types/types";
 import { Button } from "./ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
  
 
 export const columns: ColumnDef<Patient>[] = [
