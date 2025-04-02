@@ -85,17 +85,13 @@ function PatientProfile() {
             <Breadcrumb>
                 <BreadcrumbList>
                     <BreadcrumbItem>
-                        <BreadcrumbLink asChild>
                             <Link to="/">Patient List</Link>
-                        </BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                        <BreadcrumbLink>
                             <Link to={`/patients/${id}`}>
                                 {patient?.last_name}
                             </Link>
-                        </BreadcrumbLink>
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>

@@ -13,7 +13,7 @@ import numpy as np
 from .services.segmentation_service import get_segmentation_prediction, process_prediction
 from .services.classification_service import get_ckd_prediction
 from .services.image_service import get_nifti_img_path, get_avg_png_buffer, cleanup_tmp
-from .services.renogram_service import generate_renogram
+from .services.renogram_service import get_kidney_ROI_counts
 from .serializers import UserSerializer, DiagnosisReportSerializer, PatientSerializer
 from rest_framework import status
 from rest_framework import permissions
@@ -57,7 +57,7 @@ class DiagnosisReportCreateView(generics.CreateAPIView):
 
         #Overlay masks on image and save as png
         #Use masks to generate renogram
-        renogram_dict = generate_renogram(pixel_array=dicom_image, mask=nifti_mask)
+        renogram_dict = get_kidney_ROI_counts(pixel_array=dicom_image, mask=nifti_mask)
 
         #Run classification prediction
         ckd_prediction, grad_cam_buffer = get_ckd_prediction(image_nii_path, explanation=True)
@@ -81,7 +81,7 @@ class DiagnosisReportCreateView(generics.CreateAPIView):
             )
         
         #Clean up tmp directory
-        cleanup_tmp()
+        #cleanup_tmp()
 
         print(default_storage.__class__.__name__)
         
