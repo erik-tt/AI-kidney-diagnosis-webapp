@@ -8,7 +8,6 @@ import { Button } from "../components/ui/button";
 import {
     Breadcrumb,
     BreadcrumbItem,
-    BreadcrumbLink,
     BreadcrumbList,
 } from "@/components/ui/breadcrumb";
 import { PatientTable } from "@/components/PatientsTable";
