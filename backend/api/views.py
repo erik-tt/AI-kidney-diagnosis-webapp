@@ -81,7 +81,7 @@ class DiagnosisReportCreateView(generics.CreateAPIView):
             )
         
         #Clean up tmp directory
-        #cleanup_tmp()
+        cleanup_tmp()
 
         print(default_storage.__class__.__name__)
         
