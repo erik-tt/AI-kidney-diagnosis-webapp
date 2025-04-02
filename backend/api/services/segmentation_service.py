@@ -81,31 +81,39 @@ def process_prediction(model_output, image):
     mask = np.zeros((128,128),  dtype=np.uint8)
 
     if len(kidney_contours) == 2:
-        if kidney_contours[1]["center_point_x"] > kidney_contours[0]["center_point_x"]:
+        if kidney_contours[1]["center_point_x"] < kidney_contours[0]["center_point_x"]:
              #Draw the lines
              cv2.drawContours(overlay_img, kidney_contours[0]["contour"], -1, (255, 0, 0), 1)
              cv2.drawContours(overlay_img, kidney_contours[1]["contour"], -1, (0, 0, 255), 1)
              
              #Fill in the masks
-             #cv2.fillPoly(mask)
-             cv2.drawContours(mask, [kidney_contours[0]["contour"]], -1, color=1, thickness=cv2.FILLED)
-             cv2.drawContours(mask, [kidney_contours[1]["contour"]], -1, color=2, thickness=cv2.FILLED)
+             cv2.drawContours(mask, [kidney_contours[0]["contour"]], -1, color=2, thickness=cv2.FILLED)
+             cv2.drawContours(mask, [kidney_contours[1]["contour"]], -1, color=1, thickness=cv2.FILLED)
+
         else:
             cv2.drawContours(overlay_img, [kidney_contours[0]["contour"]], -1, (0, 0, 255), 1)
             cv2.drawContours(overlay_img, [kidney_contours[1]["contour"]], -1, (255, 0, 0), 1)
             #Fill in the mask
-            cv2.drawContours(mask, [kidney_contours[0]["contour"]], -1, color=2, thickness=cv2.FILLED)
-            cv2.drawContours(mask, [kidney_contours[1]["contour"]], -1, color=1, thickness=cv2.FILLED)
+            cv2.drawContours(mask, [kidney_contours[0]["contour"]], -1, color=1, thickness=cv2.FILLED)
+            cv2.drawContours(mask, [kidney_contours[1]["contour"]], -1, color=2, thickness=cv2.FILLED)
     
     if len(kidney_contours) == 1:
         if kidney_contours[0]["center_point_x"] < 64:
-            cv2.drawContours(overlay_img, kidney_contours[0]["contour"], -1, (255, 0, 0), 1)
-            cv2.drawContours(mask, kidney_contours[0]["contour"], -1, color=1,  thickness=cv2.FILLED)
+            cv2.drawContours(overlay_img, [kidney_contours[0]["contour"]], -1, (0, 0, 255), 1)
+            cv2.drawContours(mask, [kidney_contours[0]["contour"]], -1, color=1,  thickness=cv2.FILLED)
         else:
-            cv2.drawContours(overlay_img, kidney_contours[0]["contour"], -1, (0, 0, 255), 1)
-            cv2.drawContours(mask, kidney_contours[0]["contour"], -1, color=2,  thickness=cv2.FILLED)
+            cv2.drawContours(overlay_img, [kidney_contours[0]["contour"]], -1, (255, 0, 0), 1)
+            cv2.drawContours(mask, [kidney_contours[0]["contour"]], -1, color=2,  thickness=cv2.FILLED)
+
+    #Experimental
+    get_perirenal_roi(mask, 5, 3)
 
     nifti_mask = nib.Nifti1Image(mask, affine=np.eye(4))
+    #Just to observe
+    tmp_path = os.path.join(settings.BASE_DIR, f"tmp/")
+    os.makedirs(tmp_path, exist_ok=True)
+    image_nii_path = os.path.join(tmp_path, f"test.nii.gz")
+    nib.save(nifti_mask, image_nii_path)
 
     overlay_img = Image.fromarray(overlay_img)
     overlay_buffer = io.BytesIO()
@@ -113,6 +121,33 @@ def process_prediction(model_output, image):
     overlay_buffer.seek(0)
 
     return overlay_buffer, nifti_mask
+
+#ChatGPT from OpenAI has been prompted to assist in making this function
+def get_perirenal_roi(mask, outer_offset, inner_offset):
+    # Create empty perirenal ROI mask
+
+    for kidney_label in [1, 2]:  # Process left (1) and right (2) kidneys separately
+        # Create binary mask for the current kidney
+        kidney_binary = (mask == kidney_label).astype(np.uint8) * 255
+     
+        # Dilation for outer and inner contours
+        kernel_outer = np.ones((outer_offset, outer_offset), np.uint8)
+        kernel_inner = np.ones((inner_offset, inner_offset), np.uint8)
+
+        outer_mask = cv2.dilate(kidney_binary, kernel_outer, iterations=1)
+        inner_mask = cv2.dilate(kidney_binary, kernel_inner, iterations=1)
+
+        # Subtract inner from outer
+        kidney_perirenal = cv2.subtract(outer_mask, inner_mask)
+
+        # Assign the correct kidney label back
+        if kidney_label == 1:
+            mask[kidney_perirenal > 0] = 3
+        else:
+            mask[kidney_perirenal > 0] = 4
+
+
+    return mask
     
 
     

@@ -39,9 +39,7 @@ function PatientList() {
             <Breadcrumb className="">
                 <BreadcrumbList>
                     <BreadcrumbItem>
-                        <BreadcrumbLink asChild>
                             <Link to="/">Patient List</Link>
-                        </BreadcrumbLink>
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>

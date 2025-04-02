@@ -4,6 +4,7 @@ from django.conf import settings
 import numpy as np
 import nibabel as nib
 from PIL import Image
+import PIL.ImageOps
 
 tmp_path = os.path.join(settings.BASE_DIR, f"tmp/")
 os.makedirs(tmp_path, exist_ok=True)
@@ -20,7 +21,7 @@ def get_avg_png_buffer(avg_pixel_array) :
     #PNG for showing mask overlay
     #PNG need normalization
     normalized_array = ((avg_pixel_array - avg_pixel_array.min()) / (avg_pixel_array.max() - avg_pixel_array.min()) * 255).astype(np.uint8)
-    image_png = Image.fromarray(normalized_array, mode="L")
+    image_png = PIL.ImageOps.invert(Image.fromarray(normalized_array, mode="L"))
     image_png_path = os.path.join(tmp_path, f"image.png")
     image_png.save(image_png_path)
 

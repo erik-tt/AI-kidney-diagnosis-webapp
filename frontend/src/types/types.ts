@@ -12,6 +12,6 @@ export interface DiagnosisReport {
     updated: string,
     created_at: string
     png_image_overlay: string
-    renogram_dict: object
+    renogram_dict: { [key: string]: number[] }
     grad_cam : string
 }
