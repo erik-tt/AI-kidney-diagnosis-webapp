@@ -71,7 +71,7 @@ def get_ckd_prediction(niftii_path, explanation = True):
         result = grad_cam(x=tensor)
         grad_cam_im = np.array(post_transforms(result[0][0].unsqueeze(0)))
         img = nib.load(niftii_path)
-        img_pixel_array = np.array(img.dataobj)
+        img_pixel_array = 1 - np.array(img.dataobj)
         
         #Inverts it as it looks like grad cam++ from monai have high values for low priorities. Look into this and remove this if necessary.
         #grad_cam_im = 1- grad_cam_im
@@ -80,6 +80,7 @@ def get_ckd_prediction(niftii_path, explanation = True):
         heatmap = cv2.normalize(grad_cam_im.squeeze(), None, 0, 255, cv2.NORM_MINMAX)
         print(heatmap.shape)
         img_pixel_array = cv2.normalize(img_pixel_array, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+        #img_pixel_array =  255 - img_pixel_array
         img_pixel_array = cv2.cvtColor(img_pixel_array, cv2.COLOR_GRAY2BGR)
         heatmap = np.uint8(heatmap)  # Convert to uint8
 
@@ -87,7 +88,7 @@ def get_ckd_prediction(niftii_path, explanation = True):
         heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
         
         # Blend heatmap with the original image
-        overlay = cv2.addWeighted(img_pixel_array, 0.7, heatmap, 0.3, 0)
+        overlay = cv2.addWeighted(img_pixel_array, 0.6, heatmap, 0.4, 0)
         grad_cam_im = Image.fromarray(overlay)
         buffer = io.BytesIO()
         grad_cam_im.save(buffer, format="PNG")

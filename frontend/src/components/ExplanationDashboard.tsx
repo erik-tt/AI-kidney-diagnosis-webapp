@@ -20,14 +20,30 @@ function ExplanationDashboard({ report }: ExplanationDashboardProps) {
                 Grad CAM ++ Heatmap
             </h3>
             <p className="text-gray-600 text-center mb-2">
-                The red areas are important for the model in the decision making process.
+                The red areas are important for the model in the decision making process, while the blue are less relevant.
             </p>
-                                    <img
-                                        src={
-                                            report?.grad_cam
-                                        }
-                                        className="mx-auto align-middle w-94 h-94"
-                                    />
+            <div className="flex mx-auto">
+                    <img 
+                        src={
+                            report?.grad_cam
+                        }
+                        className=" w-94 h-94"
+                    />
+                    <div className="mx-2 flex">
+                        <div className="border-1 border-black opacity-70">
+                            <div className="h-47 w-8 bg-linear-to-t from-yellow-300 to-red-500"></div>
+                            <div className="h-47 w-8 bg-linear-to-t from-blue-500 to-yellow-300"></div>
+                        </div>
+                        <div className="flex-col space-y-82 ml-4 text-gray-600">
+                            <p className="align-text-top">
+                                Higher
+                            </p>
+                            <p className="align-text-bottom">
+                                Lower
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
             </div> : <p>Upload data to get an explanation</p>}
         </div>
