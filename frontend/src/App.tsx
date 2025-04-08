@@ -12,6 +12,7 @@ import "./styles/index.css";
 import Header from "./components/Header";
 import PatientProfile from "./pages/PatientProfile";
 import PatientList from "./pages/PatientList";
+import Information from "./pages/Information";
 
 function Logout() {
     localStorage.clear();
@@ -36,6 +37,14 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <PatientProfile />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/information"
+                    element={
+                        <ProtectedRoute>
+                            <Information/>
                         </ProtectedRoute>
                     }
                 />
