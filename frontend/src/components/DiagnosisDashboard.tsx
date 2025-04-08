@@ -1,5 +1,6 @@
 import { DiagnosisReport } from "@/types/types";
 import Renogram from "./Renogram";
+import { Link } from "react-router";
 
 interface DiagnosisDashboardProps {
     report : DiagnosisReport | null
@@ -71,7 +72,7 @@ function DiagnosisDashboard({ report }: DiagnosisDashboardProps) {
                                     <p className="font-semibold text-4xl mb-4">
                                         {getSRF(true) + "%"}
                                     </p>
-                                <p className="text-gray-600 text-xs">Background adjusted</p>
+                                <p className="text-gray-600 text-xs">Integral method over minute 1 to 2, adjusted for background using perirenal area</p>
                         </div>
                     </div>
                     <div className="flex lg:flex-row flex-col">
@@ -86,6 +87,7 @@ function DiagnosisDashboard({ report }: DiagnosisDashboardProps) {
                             <h3 className="mt-2 text-gray-800 text-lg">
                                 Segmented ROIs 1-3 min post injection
                             </h3>
+                            <p className="text-gray-600 text-xs"> With ML model that achieves {">"} 0.9 dice similarity score on 10 fold cross validation</p>
                             {report?.png_image_overlay ? (
                                 <div className="flex md:flex-col md:content-center lg:flex-row justify-center mt-6 ml-2">
                                     <img
@@ -113,6 +115,9 @@ function DiagnosisDashboard({ report }: DiagnosisDashboardProps) {
                                 <p>Could not load mask overlay</p>
                             )}
                         </div>
+                    </div>
+                    <div className="mt-8">
+                        <Link to="/information" className="underline text-gray-600 hover:text-gray-800 ">Learn how these values are calculated</Link>
                     </div>
                 </div>
             ) : (

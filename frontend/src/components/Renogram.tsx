@@ -34,7 +34,7 @@ function Renogram( {data} : RenogramProps) {
                 },
                 yaxis: {
                     title: {
-                        text: "ROI counts",
+                        text: "ROI counts (not background adjusted)",
                         font: { size: 14 }
                     }
                 }
