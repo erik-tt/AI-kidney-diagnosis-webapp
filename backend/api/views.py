@@ -1,8 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from rest_framework import generics
-from rest_framework.views import APIView
-from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import permissions
 from django.core.files.base import ContentFile
@@ -12,15 +10,13 @@ import numpy as np
 
 from .services.segmentation_service import get_segmentation_prediction, process_prediction
 from .services.classification_service import get_ckd_prediction
-from .services.image_service import get_nifti_img_path, get_avg_png_buffer, cleanup_tmp
+from .services.image_service import get_nifti_img_path, get_avg_png_1_3, cleanup_tmp, get_4_avg_pngs
 from .services.renogram_service import get_kidney_ROI_counts
 from .serializers import UserSerializer, DiagnosisReportSerializer, PatientSerializer
 from rest_framework import status
 from rest_framework import permissions
-from rest_framework.exceptions import NotFound
 from .models import DiagnosisReport, Patient
 from django.shortcuts import get_object_or_404
-from django.core.exceptions import MultipleObjectsReturned
 from django.core.files.storage import default_storage
 
 
@@ -41,11 +37,13 @@ class DiagnosisReportCreateView(generics.CreateAPIView):
         patient = serializer.validated_data.get("patient")
     
         #Handle images
-        avg_array = np.mean(dicom_image[6:18], axis=0)
+        avg_array_1_3 = np.mean(dicom_image[6:18], axis=0)
         #Get nifti image for segmentation (stored to tmp)
-        image_nii_path = get_nifti_img_path(avg_pixel_array=avg_array)
+        image_nii_path = get_nifti_img_path(avg_pixel_array=avg_array_1_3)
         #Get png buffer for overlay
-        image_png_path= get_avg_png_buffer(avg_pixel_array=avg_array)
+        image_png_path= get_avg_png_1_3(avg_pixel_array=avg_array_1_3)
+
+        average_image_files = get_4_avg_pngs(dicom_image)
 
         
         #Run ML segmentation prediction algorithm
@@ -70,14 +68,14 @@ class DiagnosisReportCreateView(generics.CreateAPIView):
             validated_data = serializer.validated_data
             instance, created = DiagnosisReport.objects.update_or_create(
                 patient=patient,
-                defaults={**validated_data, 'ckd_prediction': ckd_prediction, "renogram_dict": renogram_dict, "png_image_overlay": overlay_image, 'grad_cam':  grad_cam_image}
+                defaults={**validated_data, 'ckd_prediction': ckd_prediction, "renogram_dict": renogram_dict, "png_image_overlay": overlay_image, "avgimage1": average_image_files[0], "avgimage2": average_image_files[1], "avgimage3": average_image_files[2], "avgimage4": average_image_files[3], 'grad_cam':  grad_cam_image}
             )
     
         else:
             validated_data = serializer.validated_data
             instance, created = DiagnosisReport.objects.update_or_create(
                 patient=patient,
-                defaults={**validated_data, 'ckd_prediction': ckd_prediction, "renogram_dict": renogram_dict, "png_image_overlay": overlay_image}
+                defaults={**validated_data, 'ckd_prediction': ckd_prediction, "renogram_dict": renogram_dict, "png_image_overlay": overlay_image, "avgimage1": average_image_files[0], "avgimage2": average_image_files[1], "avgimage3": average_image_files[2], "avgimage4": average_image_files[3]}
             )
         
         #Clean up tmp directory

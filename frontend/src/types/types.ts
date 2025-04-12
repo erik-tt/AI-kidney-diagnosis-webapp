@@ -14,4 +14,9 @@ export interface DiagnosisReport {
     png_image_overlay: string
     renogram_dict: { [key: string]: number[] }
     grad_cam : string
+    
+    avgimage1: string
+    avgimage2: string
+    avgimage3: string
+    avgimage4: string
 }
