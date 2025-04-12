@@ -35,6 +35,10 @@ class DiagnosisReport(models.Model):
     png_image_overlay = models.ImageField(upload_to=report_directory_path, default=None)
     renogram_dict = models.JSONField(default=dict, blank=True)
     grad_cam =  models.ImageField(upload_to=report_directory_path, default=None)
+    avgimage1 = models.ImageField(upload_to=report_directory_path, default=None)
+    avgimage2 = models.ImageField(upload_to=report_directory_path, default=None)
+    avgimage3 = models.ImageField(upload_to=report_directory_path, default=None)
+    avgimage4 = models.ImageField(upload_to=report_directory_path, default=None)
 
     def __str__(self):
         return f"Diagnosis Report for {self.patient.last_name}"
