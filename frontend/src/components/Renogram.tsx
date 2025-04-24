@@ -8,7 +8,7 @@ function Renogram( {data} : RenogramProps) {
 
     const renogram_data: any = Object.entries(data).filter(([key]) => key === "1.0" || key === "2.0")
     .map(([key, values]) => ({
-        x: values.map((_ : string, index : number) => index),
+        x: values.map((_ : string, index : number) => (index*10)/60),
         y: values,
         type: 'scatter',
         mode: 'lines',
@@ -28,9 +28,10 @@ function Renogram( {data} : RenogramProps) {
                 },
                 xaxis: {
                     title: {
-                        text: "Frames",
+                        text: "Minutes",
                         font: { size: 14 }
-                    }
+                    },
+                    nticks: 10
                 },
                 yaxis: {
                     title: {
