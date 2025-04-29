@@ -167,7 +167,7 @@ function DiagnosisDashboard({ report }: DiagnosisDashboardProps) {
                         </div>
                         <div className="flex flex-col p-8 px-12 rounded-2xl shadow-sm outline-1 w-full text-center mr-2">
                             <p className="text-gray-800 text-lg">
-                                Relative left kidney function
+                                Relative left renal function
                             </p>
                             <p className="font-semibold text-4xl mb-4">
                                 {getSRF(true) + "%"}
@@ -207,7 +207,7 @@ function DiagnosisDashboard({ report }: DiagnosisDashboardProps) {
                                             </TableRow>
                                             <TableRow>
                                                 <TableCell className="font-medium">
-                                                    Rigth Kidney
+                                                    Right Kidney
                                                 </TableCell>
                                                 <TableCell>
                                                     {getTMax(false)} min

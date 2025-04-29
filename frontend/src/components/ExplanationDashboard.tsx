@@ -27,14 +27,14 @@ function ExplanationDashboard({ report }: ExplanationDashboardProps) {
                         src={
                             report?.grad_cam
                         }
-                        className=" w-94 h-94"
+                        className=" md:w-134 md:h-134 w-96 h-96"
                     />
                     <div className="mx-2 flex">
                         <div className="border-1 border-black opacity-70">
-                            <div className="h-47 w-8 bg-linear-to-t from-yellow-300 to-red-500"></div>
-                            <div className="h-47 w-8 bg-linear-to-t from-blue-500 to-yellow-300"></div>
+                            <div className="md:h-67 h-48 w-8 bg-linear-to-t from-yellow-300 to-red-500"></div>
+                            <div className="md:h-67 h-48 w-8 bg-linear-to-t from-blue-500 to-yellow-300"></div>
                         </div>
-                        <div className="flex-col space-y-82 ml-4 text-gray-600">
+                        <div className="flex-col md:space-y-120 space-y-84 ml-4 text-gray-600">
                             <p className="align-text-top">
                                 Higher
                             </p>
