@@ -55,7 +55,7 @@ def get_ckd_prediction(niftii_path, explanation = True):
     tensor = transform_image(niftii_path)
     output = model(tensor)
 
-    output = torch.argmax(output, dim=1).item()
+    output = torch.argmax(output, dim=1).item() + 1
 
     buffer = None
 

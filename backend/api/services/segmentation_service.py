@@ -44,11 +44,9 @@ def get_segmentation_prediction(image_path):
     tensor = transform_image(image_path)
     output = model(tensor)
     output = torch.argmax(output, dim=1).squeeze(0)
-    output_remove_one_hot = output.cpu().numpy()
-    #Set the right side to be 2
-    output_remove_one_hot[:, output_remove_one_hot.shape[0]//2:] = np.where(output_remove_one_hot[:, output_remove_one_hot.shape[0]//2:] == 1, 2, output_remove_one_hot[:, output_remove_one_hot.shape[0]//2:])
+    output = output.cpu().numpy()
 
-    return output_remove_one_hot
+    return output
 
 
 #Draws the contours and filter out any extra clusters of predicted kidneys
